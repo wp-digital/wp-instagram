@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Instagram
  * Description: Enables Instagram API for developers.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Author: Innocode
  * Author URI: https://innocode.com
  * Requires at least: 4.9
@@ -14,7 +14,7 @@
  */
 
 define( 'INNOCODE_INSTAGRAM', 'innocode_instagram' );
-define( 'INNOCODE_INSTAGRAM_VERSION', '0.0.1' );
+define( 'INNOCODE_INSTAGRAM_VERSION', '0.0.2' );
 
 function innocode_instagram_is_enabled() {
     return defined( 'INSTAGRAM_CLIENT_ID' ) && defined( 'INSTAGRAM_CLIENT_SECRET' );
@@ -37,7 +37,7 @@ function innocode_instagram_load() {
         require_once __DIR__ . '/includes/class-query.php';
         require_once __DIR__ . '/includes/class-admin.php';
 
-        $GLOBALS['innocode_instagram'] = new InnocodeInstagram\API();
+        $GLOBALS['innocode_instagram'] = new InnocodeInstagram\API( isset( $_GET['blog_id'] ) ? absint( $_GET['blog_id'] ) : 0 );
     }
 }
 
@@ -62,13 +62,18 @@ function innocode_instagram_scope() {
 }
 
 /**
+ * @param int $blog_id
+ *
  * @return string
  */
-function innocode_instagram_callback() {
+function innocode_instagram_callback( $blog_id = 0 ) {
     return add_query_arg(
         'blog_id',
-        get_current_blog_id(),
-        network_home_url( '/instagram/auth/', is_ssl() ? 'https' : 'http' )
+        $blog_id ? $blog_id : get_current_blog_id(),
+        network_home_url(
+            apply_filters( innocode_instagram_sanitize_key( 'endpoint' ), '/instagram/auth/' ),
+            is_ssl() ? 'https' : 'http'
+        )
     );
 }
 
