@@ -12,7 +12,7 @@ with ability to get access token through WordPress admin panel.
 - Preferable way is to use [Composer](https://getcomposer.org/):
 
     ````
-    composer require innocode/wp-instagram
+    composer require innocode-digital/wp-instagram
     ````
 
     By default it will be installed as [Must Use Plugin](https://codex.wordpress.org/Must_Use_Plugins).
