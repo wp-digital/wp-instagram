@@ -66,6 +66,11 @@ final class Plugin
         add_action( 'admin_init', function () {
             $this->_add_sections();
             $this->_add_fields();
+            $options_page_hook = $this->get_options_page()->get_hook();
+
+            add_action( "load-$options_page_hook", function () {
+                $this->_verify_access_token();
+            } );
         } );
     }
 
@@ -339,7 +344,6 @@ final class Plugin
             $options_page->get_capability(),
             $options_page->get_menu_slug(),
             function () {
-                $this->_verify_access_token();
                 $view = $this->get_options_page()->get_view();
                 $file = $this->get_view_file( $view );
 

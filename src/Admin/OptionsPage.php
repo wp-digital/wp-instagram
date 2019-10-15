@@ -150,6 +150,14 @@ class OptionsPage
     }
 
     /**
+     * @return string
+     */
+    public function get_hook()
+    {
+        return get_plugin_page_hook( $this->get_menu_slug(), 'options-general.php' );
+    }
+
+    /**
      * @return bool
      */
     public function has_enabled_fields()

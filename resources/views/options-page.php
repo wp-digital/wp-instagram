@@ -19,7 +19,6 @@ $access_token = $options_page->get_sections()['']
 ?>
 <div class="wrap">
     <h2><?= $options_page->get_title() ?></h2>
-    <?php do_action( 'admin_notices' ) ?>
     <p class="submit">
         <a href="<?= $login_url ?>" class="button <?= $access_token === '' ? 'button-primary' : '' ?>">
             <?= $access_token !== '' ? __( 'Log in as another user', 'innocode-instagram' ) : __( 'Log in' ) ?>
