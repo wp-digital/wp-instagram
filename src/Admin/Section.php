@@ -11,15 +11,15 @@ class Section
     /**
      * @var string
      */
-    protected $_name;
+    protected $name;
     /**
      * @var string
      */
-    protected $_title;
+    protected $title;
     /**
      * @var Field[]
      */
-    protected $_fields = [];
+    protected $fields = [];
 
     /**
      * Section constructor.
@@ -28,8 +28,8 @@ class Section
      */
     public function __construct( $name, $title )
     {
-        $this->_name = $name;
-        $this->_title = $title;
+        $this->name = $name;
+        $this->title = $title;
     }
 
     /**
@@ -37,7 +37,7 @@ class Section
      */
     public function get_name()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -45,7 +45,7 @@ class Section
      */
     public function get_title()
     {
-        return $this->_title;
+        return $this->title;
     }
 
     /**
@@ -53,7 +53,7 @@ class Section
      */
     public function get_fields()
     {
-        return $this->_fields;
+        return $this->fields;
     }
 
     /**
@@ -62,6 +62,6 @@ class Section
      */
     public function add_field( $name, Field $field )
     {
-        $this->_fields[ $name ] = $field;
+        $this->fields[ $name ] = $field;
     }
 }

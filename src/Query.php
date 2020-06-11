@@ -11,11 +11,11 @@ final class Query
     /**
      * @var string
      */
-    private $_endpoint;
+    private $endpoint ;
     /**
      * @var array
      */
-    private $_routes = [];
+    private $routes = [];
 
     /**
      * Query constructor.
@@ -23,7 +23,7 @@ final class Query
      */
     public function __construct( $endpoint )
     {
-        $this->_endpoint = $endpoint;
+        $this->endpoint = $endpoint;
     }
 
     /**
@@ -31,7 +31,7 @@ final class Query
      */
     public function get_endpoint()
     {
-        return $this->_endpoint;
+        return $this->endpoint;
     }
 
     /**
@@ -39,7 +39,7 @@ final class Query
      */
     public function get_routes()
     {
-        return $this->_routes;
+        return $this->routes;
     }
 
     /**
@@ -48,7 +48,7 @@ final class Query
      */
     public function add_route( $uri, callable $callback )
     {
-        $this->_routes[ $uri ] = $callback;
+        $this->routes[ $uri ] = $callback;
     }
 
     /**

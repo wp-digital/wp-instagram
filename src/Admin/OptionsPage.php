@@ -11,31 +11,31 @@ class OptionsPage
     /**
      * @var string
      */
-    protected $_name;
+    protected $name;
     /**
      * @var string
      */
-    protected $_menu_slug;
+    protected $menu_slug;
     /**
      * @var string
      */
-    protected $_title;
+    protected $title;
     /**
      * @var string
      */
-    protected $_menu_title;
+    protected $menu_title;
     /**
      * @var string
      */
-    protected $_capability = 'manage_options';
+    protected $capability = 'manage_options';
     /**
      * @var string
      */
-    protected $_view;
+    protected $view;
     /**
      * @var Section[]
      */
-    protected $_sections = [];
+    protected $sections = [];
 
     /**
      * OptionsPage constructor.
@@ -45,10 +45,10 @@ class OptionsPage
      */
     public function __construct( $name, $menu_slug, $title )
     {
-        $this->_name = $name;
-        $this->_menu_slug = $menu_slug;
-        $this->_title = $title;
-        $this->_menu_title = $title;
+        $this->name = $name;
+        $this->menu_slug = $menu_slug;
+        $this->title = $title;
+        $this->menu_title = $title;
     }
 
     /**
@@ -56,7 +56,7 @@ class OptionsPage
      */
     public function get_name()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -64,7 +64,7 @@ class OptionsPage
      */
     public function get_menu_slug()
     {
-        return $this->_menu_slug;
+        return $this->menu_slug;
     }
 
     /**
@@ -72,7 +72,7 @@ class OptionsPage
      */
     public function get_title()
     {
-        return $this->_title;
+        return $this->title;
     }
 
     /**
@@ -80,7 +80,7 @@ class OptionsPage
      */
     public function get_menu_title()
     {
-        return $this->_menu_title;
+        return $this->menu_title;
     }
 
     /**
@@ -88,7 +88,7 @@ class OptionsPage
      */
     public function set_menu_title( $menu_title )
     {
-        $this->_menu_title = $menu_title;
+        $this->menu_title = $menu_title;
     }
 
     /**
@@ -96,7 +96,7 @@ class OptionsPage
      */
     public function get_capability()
     {
-        return $this->_capability;
+        return $this->capability;
     }
 
     /**
@@ -104,7 +104,7 @@ class OptionsPage
      */
     public function set_capability( $capability )
     {
-        $this->_capability = $capability;
+        $this->capability = $capability;
     }
 
     /**
@@ -112,7 +112,7 @@ class OptionsPage
      */
     public function get_view()
     {
-        return $this->_view;
+        return $this->view;
     }
 
     /**
@@ -120,7 +120,7 @@ class OptionsPage
      */
     public function set_view( $view )
     {
-        $this->_view = $view;
+        $this->view = $view;
     }
 
     /**
@@ -128,7 +128,7 @@ class OptionsPage
      */
     public function get_sections()
     {
-        return $this->_sections;
+        return $this->sections;
     }
 
     /**
@@ -137,7 +137,7 @@ class OptionsPage
      */
     public function add_section( $name, Section $section )
     {
-        $this->_sections[ $name ] = $section;
+        $this->sections[ $name ] = $section;
     }
 
     /**

@@ -18,15 +18,15 @@ class Setting
     /**
      * @var string
      */
-    protected $_name;
+    protected $name;
     /**
      * @var string
      */
-    protected $_title;
+    protected $title;
     /**
      * @var array
      */
-    protected $_args = [];
+    protected $args = [];
 
     /**
      * Setting constructor.
@@ -35,8 +35,8 @@ class Setting
      */
     public function __construct( $name, $title )
     {
-        $this->_name = $name;
-        $this->_title = $title;
+        $this->name = $name;
+        $this->title = $title;
     }
 
     /**
@@ -44,7 +44,7 @@ class Setting
      */
     public function get_name()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -52,7 +52,7 @@ class Setting
      */
     public function get_title()
     {
-        return $this->_title;
+        return $this->title;
     }
 
     /**
@@ -61,7 +61,7 @@ class Setting
      */
     public function __set( $name, $value )
     {
-        $this->_args[ $name ] = $value;
+        $this->args[ $name ] = $value;
     }
 
     /**
@@ -70,8 +70,8 @@ class Setting
      */
     public function __get( $name )
     {
-        if ( array_key_exists( $name, $this->_args ) ) {
-            return $this->_args[ $name ];
+        if ( array_key_exists( $name, $this->args ) ) {
+            return $this->args[ $name ];
         }
 
         throw new InvalidArgumentException(
@@ -88,7 +88,7 @@ class Setting
      */
     public function get_args()
     {
-        return wp_parse_args( $this->_args, [
+        return wp_parse_args( $this->args, [
             'sanitize_callback' => 'sanitize_text_field',
             'default'           => '',
         ] );

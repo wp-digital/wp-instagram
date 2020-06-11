@@ -20,19 +20,19 @@ final class Plugin
     /**
      * @var string
      */
-    private $_path;
+    private $path;
     /**
      * @var Query
      */
-    private $_query;
+    private $query;
     /**
      * @var OptionsPage
      */
-    private $_options_page;
+    private $options_page;
     /**
      * @var Instagram
      */
-    private $_instagram;
+    private $instagram;
 
     /**
      * Plugin constructor.
@@ -41,19 +41,19 @@ final class Plugin
      */
     public function __construct( $path )
     {
-        $this->_path = $path;
-        $this->_init_query();
-        $this->_init_options_page();
-        $this->_init_sections();
-        $this->_init_fields();
-        $this->_init_instagram();
+        $this->path = $path;
+        $this->init_query();
+        $this->init_options_page();
+        $this->init_sections();
+        $this->init_fields();
+        $this->init_instagram();
     }
 
     public function run()
     {
         if ( is_main_site() ) {
             add_action( 'init', function () {
-                $this->_add_rewrite_endpoints();
+                $this->add_rewrite_endpoints();
             } );
             add_action( 'template_redirect', function () {
                 $this->get_query()->handle_request();
@@ -61,15 +61,15 @@ final class Plugin
         }
 
         add_action( 'admin_menu', function () {
-            $this->_add_options_page();
+            $this->add_options_page();
         } );
         add_action( 'admin_init', function () {
-            $this->_add_sections();
-            $this->_add_fields();
+            $this->add_sections();
+            $this->add_fields();
             $options_page_hook = $this->get_options_page()->get_hook();
 
             add_action( "load-$options_page_hook", function () {
-                $this->_verify_access_token();
+                $this->verify_access_token();
             } );
         } );
     }
@@ -79,7 +79,7 @@ final class Plugin
      */
     public function get_path()
     {
-        return $this->_path;
+        return $this->path;
     }
 
     /**
@@ -87,7 +87,7 @@ final class Plugin
      */
     public function get_options_page()
     {
-        return $this->_options_page;
+        return $this->options_page;
     }
 
     /**
@@ -95,7 +95,7 @@ final class Plugin
      */
     public function get_query()
     {
-        return $this->_query;
+        return $this->query;
     }
 
     /**
@@ -103,7 +103,7 @@ final class Plugin
      */
     public function get_instagram()
     {
-        return $this->_instagram;
+        return $this->instagram;
     }
 
     /**
@@ -111,7 +111,7 @@ final class Plugin
      */
     public function get_views_dir()
     {
-        return "$this->_path/resources/views";
+        return "$this->path/resources/views";
     }
 
     /**
@@ -147,7 +147,10 @@ final class Plugin
     {
         $blog_id = isset( $_GET['blog_id'] ) ? intval( $_GET['blog_id'] ) : 0;
 
-        if ( ! $blog_id || false === ( $blog = get_blog_details( $blog_id ) ) ) {
+        if (
+            ! $blog_id ||
+            is_multisite() && false === ( $blog = get_blog_details( $blog_id ) )
+        ) {
             wp_die(
                 '<h1>' . __( 'Something went wrong.' ) . '</h1>' .
                 '<p>' . __( 'Invalid blog ID.', 'innocode-instagram' ) . '</p>',
@@ -155,12 +158,13 @@ final class Plugin
             );
         }
 
+        $blogname = isset( $blog ) ? $blog->blogname : get_bloginfo( 'name' );
         $options_page = $this->get_options_page();
-        $options_page_url = $options_page->get_admin_url( $blog->blog_id );
+        $options_page_url = $options_page->get_admin_url( $blog_id );
         $return_link = sprintf(
             '<p><a href="%s">%s</a>.</p>',
             $options_page_url,
-            sprintf( __( 'Return to %s', 'innocode-instagram' ), $blog->blogname )
+            sprintf( __( 'Return to %s', 'innocode-instagram' ), $blogname )
         );
         $code = isset( $_GET['code'] ) ? $_GET['code'] : '';
 
@@ -199,7 +203,11 @@ final class Plugin
         if ( isset( $oauth_token->access_token ) ) {
             $name = $general_fields['access_token']->get_setting()->get_name();
 
-            update_blog_option( $blog->blog_id, $name, $oauth_token->access_token );
+            if ( is_multisite() ) {
+                update_blog_option( $blog_id, $name, $oauth_token->access_token );
+            } else {
+                update_option( $name, $oauth_token->access_token );
+            }
         }
 
         $user_fields = $sections['user']->get_fields();
@@ -212,27 +220,31 @@ final class Plugin
 
                 $name = $user_fields[ $param ]->get_setting()->get_name();
 
-                update_blog_option( $blog->blog_id, $name, $value );
+                if ( is_multisite() ) {
+                    update_blog_option( $blog_id, $name, $value );
+                } else {
+                    update_option( $name, $value );
+                }
             }
         }
 
         wp_redirect( $options_page_url );
     }
 
-    private function _init_query()
+    private function init_query()
     {
-        $this->_query = new Query(
+        $this->query = new Query(
             defined( 'INNOCODE_INSTAGRAM_ENDPOINT' ) ? INNOCODE_INSTAGRAM_ENDPOINT : 'instagram'
         );
-        $this->_query->add_route( 'auth', [ $this, 'auth' ] );
+        $this->query->add_route( 'auth', [ $this, 'auth' ] );
     }
 
     /**
      * @throws Exception
      */
-    private function _init_instagram()
+    private function init_instagram()
     {
-        $this->_instagram = new Instagram( [
+        $this->instagram = new Instagram( [
             'apiKey'      => defined( 'INSTAGRAM_CLIENT_ID' ) ? INSTAGRAM_CLIENT_ID : '',
             'apiSecret'   => defined( 'INSTAGRAM_CLIENT_SECRET' ) ? INSTAGRAM_CLIENT_SECRET : '',
             'apiCallback' => $this->get_api_callback(),
@@ -242,21 +254,21 @@ final class Plugin
             ->get_fields()['access_token']
             ->get_setting()
             ->get_value();
-        $this->_instagram->setAccessToken( $access_token );
+        $this->instagram->setAccessToken( $access_token );
     }
 
-    private function _init_options_page()
+    private function init_options_page()
     {
-        $this->_options_page = new OptionsPage(
+        $this->options_page = new OptionsPage(
             Helpers::key( INNOCODE_INSTAGRAM ),
             'innocode-instagram',
             __( 'Instagram Settings', 'agrol-membership' )
         );
-        $this->_options_page->set_menu_title( __( 'Instagram', 'agrol-membership' ) );
-        $this->_options_page->set_view( 'options-page.php' );
+        $this->options_page->set_menu_title( __( 'Instagram', 'agrol-membership' ) );
+        $this->options_page->set_view( 'options-page.php' );
     }
 
-    private function _init_sections()
+    private function init_sections()
     {
         $options_page = $this->get_options_page();
         $options_page_name = $options_page->get_name();
@@ -270,7 +282,7 @@ final class Plugin
         }
     }
 
-    private function _init_fields()
+    private function init_fields()
     {
         $options_page = $this->get_options_page();
         $sections = $options_page->get_sections();
@@ -324,7 +336,7 @@ final class Plugin
         $sections['user']->add_field( $name, $field );
     }
 
-    private function _add_rewrite_endpoints()
+    private function add_rewrite_endpoints()
     {
         $endpoint = $this->get_query()->get_endpoint();
 
@@ -334,7 +346,7 @@ final class Plugin
         );
     }
 
-    private function _add_options_page()
+    private function add_options_page()
     {
         $options_page = $this->get_options_page();
 
@@ -352,7 +364,7 @@ final class Plugin
         );
     }
 
-    private function _add_sections()
+    private function add_sections()
     {
         $options_page = $this->get_options_page();
         $options_page_slug = $options_page->get_menu_slug();
@@ -367,7 +379,7 @@ final class Plugin
         }
     }
 
-    private function _add_fields()
+    private function add_fields()
     {
         $options_page = $this->get_options_page();
         $options_page_slug = $options_page->get_menu_slug();
@@ -396,7 +408,7 @@ final class Plugin
         }
     }
 
-    private function _verify_access_token()
+    private function verify_access_token()
     {
         $instagram = $this->get_instagram();
         $access_token = $instagram->getAccessToken();
@@ -414,7 +426,7 @@ final class Plugin
                 ->get_fields()['access_token']
                 ->get_setting()->get_name();
 
-            delete_blog_option( get_current_blog_id(), $name );
+            delete_option( $name );
             add_action( 'admin_notices', function () use ( $user ) {
                 $message = sprintf(
                     '<b>%s:</b> %s',

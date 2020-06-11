@@ -11,34 +11,34 @@ class Field
     /**
      * @var Setting
      */
-    protected $_setting;
+    protected $setting;
     /**
      * @var string
      */
-    protected $_type = 'text';
+    protected $type = 'text';
     /**
      * @var string
      */
-    protected $_id;
+    protected $id;
     /**
      * @var array
      */
-    protected $_attrs = [];
+    protected $attrs = [];
     /**
      * @var callable
      */
-    protected $_callback;
+    protected $callback;
     /**
      * @var string
      */
-    protected $_description;
+    protected $description;
 
     /**
      * @return Setting
      */
     public function get_setting()
     {
-        return $this->_setting;
+        return $this->setting;
     }
 
     /**
@@ -46,7 +46,7 @@ class Field
      */
     public function set_setting( Setting $setting )
     {
-        $this->_setting = $setting;
+        $this->setting = $setting;
     }
 
     /**
@@ -54,7 +54,7 @@ class Field
      */
     public function get_type()
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
@@ -62,7 +62,7 @@ class Field
      */
     public function set_type( $type )
     {
-        $this->_type = $type;
+        $this->type = $type;
     }
 
     /**
@@ -70,7 +70,7 @@ class Field
      */
     public function get_id()
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -78,7 +78,7 @@ class Field
      */
     public function set_id( $id )
     {
-        $this->_id = $id;
+        $this->id = $id;
     }
 
     /**
@@ -86,7 +86,7 @@ class Field
      */
     public function get_attrs()
     {
-        return wp_parse_args( $this->_attrs, [
+        return wp_parse_args( $this->attrs, [
             'type' => 'text',
         ] );
     }
@@ -96,7 +96,7 @@ class Field
      */
     public function set_attrs( array $attrs )
     {
-        $this->_attrs = $attrs;
+        $this->attrs = $attrs;
     }
 
     /**
@@ -106,7 +106,7 @@ class Field
     {
         return implode( ' ', array_map( function ( $name, $value ) {
             return esc_attr( $name ) . '="' . esc_attr( $value ) . '"';
-        }, array_keys( $this->_attrs ), $this->_attrs ) );
+        }, array_keys( $this->attrs ), $this->attrs ) );
     }
 
     /**
@@ -115,7 +115,7 @@ class Field
      */
     public function add_attr( $name, $value )
     {
-        $this->_attrs[ $name ] = $value;
+        $this->attrs[ $name ] = $value;
     }
 
     /**
@@ -123,7 +123,7 @@ class Field
      */
     public function get_callback()
     {
-        return $this->_callback;
+        return $this->callback;
     }
 
     /**
@@ -131,7 +131,7 @@ class Field
      */
     public function set_callback( callable $callback )
     {
-        $this->_callback = $callback;
+        $this->callback = $callback;
     }
 
     /**
@@ -139,7 +139,7 @@ class Field
      */
     public function get_description()
     {
-        return $this->_description;
+        return $this->description;
     }
 
     /**
@@ -147,7 +147,7 @@ class Field
      */
     public function set_description( $description )
     {
-        $this->_description = $description;
+        $this->description = $description;
     }
 
     public function get_html()

@@ -2,11 +2,11 @@
 /**
  * Plugin Name: Instagram
  * Description: Enables Instagram API for developers.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Innocode
  * Author URI: https://innocode.com
  * Requires at least: 4.9
- * Tested up to: 5.2.3
+ * Tested up to: 5.4.2
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -20,8 +20,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 }
 
 if ( defined( 'INSTAGRAM_CLIENT_ID' ) && defined( 'INSTAGRAM_CLIENT_SECRET' ) ) {
-    $innocode_instagram = new Instagram\Plugin( __DIR__ );
-    $innocode_instagram->run();
+    $GLOBALS['innocode_instagram'] = new Instagram\Plugin( __DIR__ );
+    $GLOBALS['innocode_instagram']->run();
 }
 
 if ( ! function_exists( 'innocode_instagram' ) ) {
