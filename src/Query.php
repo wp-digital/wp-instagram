@@ -21,7 +21,7 @@ final class Query
      * Query constructor.
      * @param string $endpoint
      */
-    public function __construct( $endpoint )
+    public function __construct( string $endpoint )
     {
         $this->endpoint = $endpoint;
     }
@@ -43,19 +43,20 @@ final class Query
     }
 
     /**
-     * @param string   $uri
-     * @param callable $callback
+     * @param string      $uri
+     * @param callable    $callback
+     * @param string|null $capability
      */
-    public function add_route( $uri, callable $callback )
+    public function add_route( string $uri, callable $callback, string $capability = null )
     {
-        $this->routes[ $uri ] = $callback;
+        $this->routes[ $uri ] = [ $callback, $capability ];
     }
 
     /**
      * @param string $uri
      * @return string
      */
-    public function path( $uri )
+    public function path( string $uri )
     {
         return "/{$this->get_endpoint()}/$uri/";
     }
@@ -64,7 +65,7 @@ final class Query
      * @param string $uri
      * @return string
      */
-    public function url( $uri )
+    public function url( string $uri )
     {
         return network_home_url(
             $this->path( $uri ),
@@ -83,8 +84,14 @@ final class Query
 
         $routes = $this->get_routes();
 
-        if ( isset( $routes[ $uri ] ) ) {
-            $routes[ $uri ]();
+        if (
+            isset( $routes[ $uri ] ) &&
+            (
+                ! isset( $routes[ $uri ][1] ) ||
+                current_user_can( $routes[ $uri ][1] )
+            )
+        ) {
+            $routes[ $uri ][0]();
 
             exit;
         }

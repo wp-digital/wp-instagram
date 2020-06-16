@@ -26,7 +26,7 @@ class Section
      * @param string $name
      * @param string $title
      */
-    public function __construct( $name, $title )
+    public function __construct( string $name, string $title )
     {
         $this->name = $name;
         $this->title = $title;
@@ -60,7 +60,7 @@ class Section
      * @param string $name
      * @param Field  $field
      */
-    public function add_field( $name, Field $field )
+    public function add_field( string $name, Field $field )
     {
         $this->fields[ $name ] = $field;
     }

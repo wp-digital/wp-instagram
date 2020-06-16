@@ -60,7 +60,7 @@ class Field
     /**
      * @param string $type
      */
-    public function set_type( $type )
+    public function set_type( string $type )
     {
         $this->type = $type;
     }
@@ -76,7 +76,7 @@ class Field
     /**
      * @param string $id
      */
-    public function set_id( $id )
+    public function set_id( string $id )
     {
         $this->id = $id;
     }
@@ -113,7 +113,7 @@ class Field
      * @param string $name
      * @param string $value
      */
-    public function add_attr( $name, $value )
+    public function add_attr( string $name, string $value )
     {
         $this->attrs[ $name ] = $value;
     }
@@ -145,7 +145,7 @@ class Field
     /**
      * @param string $description
      */
-    public function set_description( $description )
+    public function set_description( string $description )
     {
         $this->description = $description;
     }

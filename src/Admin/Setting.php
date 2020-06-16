@@ -33,7 +33,7 @@ class Setting
      * @param string $name
      * @param string $title
      */
-    public function __construct( $name, $title )
+    public function __construct( string $name, string $title )
     {
         $this->name = $name;
         $this->title = $title;
@@ -59,7 +59,7 @@ class Setting
      * @param string $name
      * @param mixed  $value
      */
-    public function __set( $name, $value )
+    public function __set( string $name, $value )
     {
         $this->args[ $name ] = $value;
     }
@@ -95,10 +95,41 @@ class Setting
     }
 
     /**
-     * @return mixed
+     * @param mixed    $default
+     * @param int|null $blog_id
+     * @return bool|mixed
      */
-    public function get_value()
+    public function get_value( $default = false, int $blog_id = null )
     {
-        return get_option( $this->get_name() );
+        if ( $blog_id && is_multisite() ) {
+            return get_blog_option( $blog_id, $this->get_name(), $default );
+        } else {
+            return get_option( $this->get_name(), $default );
+        }
+    }
+
+    /**
+     * @param mixed    $value
+     * @param int|null $blog_id
+     */
+    public function update_value( $value, int $blog_id = null )
+    {
+        if ( $blog_id && is_multisite() ) {
+            update_blog_option( $blog_id, $this->get_name(), $value );
+        } else {
+            update_option( $this->get_name(), $value );
+        }
+    }
+
+    /**
+     * @param int|null $blog_id
+     */
+    public function delete_value( int $blog_id = null )
+    {
+        if ( $blog_id && is_multisite() ) {
+            delete_blog_option( $blog_id, $this->get_name() );
+        } else {
+            delete_option( $this->get_name() );
+        }
     }
 }

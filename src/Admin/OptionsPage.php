@@ -43,7 +43,7 @@ class OptionsPage
      * @param string $menu_slug
      * @param string $title
      */
-    public function __construct( $name, $menu_slug, $title )
+    public function __construct( string $name, string $menu_slug, string $title )
     {
         $this->name = $name;
         $this->menu_slug = $menu_slug;
@@ -86,7 +86,7 @@ class OptionsPage
     /**
      * @param string $menu_title
      */
-    public function set_menu_title( $menu_title )
+    public function set_menu_title( string $menu_title )
     {
         $this->menu_title = $menu_title;
     }
@@ -102,7 +102,7 @@ class OptionsPage
     /**
      * @param string $capability
      */
-    public function set_capability( $capability )
+    public function set_capability( string $capability )
     {
         $this->capability = $capability;
     }
@@ -118,7 +118,7 @@ class OptionsPage
     /**
      * @param string $view
      */
-    public function set_view( $view )
+    public function set_view( string $view )
     {
         $this->view = $view;
     }
@@ -135,7 +135,7 @@ class OptionsPage
      * @param string  $name
      * @param Section $section
      */
-    public function add_section( $name, Section $section )
+    public function add_section( string $name, Section $section )
     {
         $this->sections[ $name ] = $section;
     }
@@ -144,7 +144,7 @@ class OptionsPage
      * @param int|null $blog_id
      * @return string
      */
-    public function get_admin_url( $blog_id = null )
+    public function get_admin_url( int $blog_id = null )
     {
         return get_admin_url( $blog_id, "options-general.php?page={$this->get_menu_slug()}" );
     }

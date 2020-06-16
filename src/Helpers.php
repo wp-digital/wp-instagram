@@ -13,7 +13,7 @@ class Helpers
      * @param string $section
      * @return string
      */
-    public static function key( $name, $section = '' )
+    public static function key( string $name, string $section = '' )
     {
         if ( $section ) {
             $separator = $name ? '_' : '';
