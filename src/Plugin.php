@@ -30,7 +30,7 @@ final class Plugin
     /**
      * @var string
      */
-    private $path;
+    private $file;
     /**
      * @var Query
      */
@@ -48,14 +48,14 @@ final class Plugin
      * Plugin constructor.
      * @param string $client_id
      * @param string $client_secret
-     * @param string $path
+     * @param string $file
      * @throws InstagramBasicDisplayException
      */
-    public function __construct( string $client_id, string $client_secret, string $path )
+    public function __construct( string $client_id, string $client_secret, string $file )
     {
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
-        $this->path = $path;
+        $this->file = $file;
 
         $this->init_options_page();
         $this->init_sections();
@@ -73,15 +73,18 @@ final class Plugin
 
         add_action( 'admin_menu', [ $this, 'add_options_page' ] );
         add_action( 'admin_init', [ $this, 'admin_init' ] );
-        add_action( 'innocode_instagram_refresh', [ $this, 'refresh' ] );
+        add_action( 'innocode_instagram_scheduled_refresh', [ $this, 'scheduled_refresh' ] );
+        add_action( 'init', [ $this, 'schedule' ] );
+
+        register_deactivation_hook( $this->get_file(), [ $this, 'deactivate' ] );
     }
 
     /**
      * @return string
      */
-    public function get_path()
+    public function get_file()
     {
-        return $this->path;
+        return $this->file;
     }
 
     /**
@@ -122,6 +125,14 @@ final class Plugin
     public function get_instagram()
     {
         return $this->instagram;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_path()
+    {
+        return dirname( $this->get_file() );
     }
 
     /**
@@ -538,7 +549,7 @@ final class Plugin
         }
     }
 
-    public function refresh()
+    public function scheduled_refresh()
     {
         $instagram = $this->get_instagram();
         $access_token = $instagram->getAccessToken();
@@ -581,5 +592,43 @@ final class Plugin
                     ->update_value( $value );
             }
         }
+    }
+
+    public function schedule()
+    {
+        $instagram = $this->get_instagram();
+        $access_token = $instagram->getAccessToken();
+
+        if ( ! $access_token ) {
+            $this->unschedule();
+
+            return;
+        }
+
+        if (
+            ! wp_next_scheduled( 'innocode_instagram_scheduled_refresh' ) &&
+            ! wp_installing()
+        ) {
+            wp_schedule_event(
+                time(),
+                'daily',
+                'innocode_instagram_scheduled_refresh'
+            );
+        }
+    }
+
+    public function unschedule()
+    {
+        if (
+            false !== ( $timestamp = wp_next_scheduled( 'innocode_instagram_scheduled_refresh' ) ) &&
+            ! wp_installing()
+        ) {
+            wp_unschedule_event( $timestamp, 'innocode_instagram_scheduled_refresh' );
+        }
+    }
+
+    public function deactivate()
+    {
+        $this->unschedule();
     }
 }

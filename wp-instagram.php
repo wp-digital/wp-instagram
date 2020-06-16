@@ -24,7 +24,7 @@ if ( defined( 'INSTAGRAM_CLIENT_ID' ) && defined( 'INSTAGRAM_CLIENT_SECRET' ) ) 
     $GLOBALS['innocode_instagram'] = new Instagram\Plugin(
         INSTAGRAM_CLIENT_ID,
         INSTAGRAM_CLIENT_SECRET,
-        __DIR__
+        __FILE__
     );
     $GLOBALS['innocode_instagram']->run();
 }

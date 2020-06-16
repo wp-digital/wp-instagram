@@ -1,7 +1,7 @@
 {
   "name": "innocode-digital/wp-instagram",
   "version": "2.0.0",
-  "type": "wordpress-muplugin",
+  "type": "wordpress-plugin",
   "license": "GPL-2.0+",
   "require": {
     "composer/installers": "~1.0",
