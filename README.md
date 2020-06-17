@@ -56,12 +56,12 @@ account.
 ### Notes
 
 If site is a part of [Multisite](https://wordpress.org/support/article/create-a-network/)
-then main site auth URL should be added in **Valid redirect URIs**. So, plugin should be active on all network or
-at least on the main site.
+then main site auth URL should be added in **Valid OAuth Redirect URIs**.
+So, plugin should be active on all network or at least on the main site additionally.
 
 ### Documentation
 
-By default endpoint auth URL is using `instagram` as endpoint but it's possible to
+By default, endpoint auth URL is using `instagram` as endpoint, but it's possible to
 change with constant:
 
 ````
