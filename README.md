@@ -1,10 +1,10 @@
-# Wordpress Instagram integration
+# WordPress Instagram integration
 
 ### Description
 
 Enables Instagram API for developers.
 
-The idea of plugin is to use [Instagram-PHP-API](https://github.com/espresso-dev/instagram-basic-display-php)
+The idea of plugin is to use [Instagram Basic Display PHP API](https://github.com/espresso-dev/instagram-basic-display-php)
 with ability to get access token through WordPress admin panel.
 
 ### Install
@@ -39,7 +39,7 @@ create an APP.
     define( 'INSTAGRAM_CLIENT_SECRET', '' );
     ````
     
-3. Add site auth URL `https://site.com/instagram/auth/ ` to **Valid OAuth Redirect URIs** in **Basic Display**.
+3. Add site auth URL `https://site.com/instagram/auth/` to **Valid OAuth Redirect URIs** in **Basic Display**.
 
 4. Open settings page in WordPress admin panel **Settings** -> **Instagram** 
 `/wp-admin/options-general.php?page=innocode-instagram`
@@ -47,8 +47,8 @@ create an APP.
 5. Click on **Log in** button or **Log in as another user** in case when should change
 account.
 
-6. Start use [Instagram-PHP-API](https://github.com/cosenary/Instagram-PHP-API) through
-`innocode_instagram();` function. E.g. `innocode_instagram()->getUser();`.
+6. Start use [Instagram Basic Display PHP API](https://github.com/cosenary/Instagram-PHP-API) through
+`innocode_instagram();` function. E.g. `innocode_instagram()->getUserProfile();`.
 
 7. (optional) Add site deauth REST API endpoint `https://site.com/wp-json/innocode/v1/instagram/deauth` to
 **Deauthorize Callback URL** in **Basic Display**. 

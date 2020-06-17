@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Instagram
+ * Plugin Name: WordPress Instagram integration
  * Description: Enables Instagram API for developers.
  * Version: 2.0.0
  * Author: Innocode
