@@ -20,29 +20,40 @@ final class Plugin
     const SECTION_USER = 'user';
 
     /**
+     * APP ID.
      * @var string
      */
     private $client_id;
     /**
+     * APP secret.
      * @var string
      */
     private $client_secret;
     /**
+     * Plugin __FILE__.
      * @var string
      */
     private $file;
     /**
+     * Query object.
      * @var Query
      */
     private $query;
     /**
+     * Admin page.
      * @var OptionsPage
      */
     private $options_page;
     /**
+     * Instagram client.
      * @var InstagramBasicDisplay
      */
     private $instagram;
+    /**
+     * REST controller.
+     * @var RESTController
+     */
+    private $rest_controller;
 
     /**
      * Plugin constructor.
@@ -62,8 +73,12 @@ final class Plugin
         $this->init_fields();
         $this->init_query();
         $this->init_instagram();
+        $this->init_rest_controller();
     }
 
+    /**
+     * Adds hooks.
+     */
     public function run()
     {
         if ( is_main_site() ) {
@@ -71,15 +86,31 @@ final class Plugin
             add_action( 'template_redirect', [ $this, 'handle_request' ] );
         }
 
+        $user_id_setting_name = $this->get_options_page()
+            ->get_sections()[ static::SECTION_USER ]
+            ->get_fields()['id']
+            ->get_setting()
+            ->get_name();
+
+        add_action( "add_option_$user_id_setting_name", [ $this, 'add_user_id' ], 10, 2 );
+        add_action( "update_option_$user_id_setting_name", [ $this, 'update_user_id' ], 10, 3 );
+        add_action( "delete_option_$user_id_setting_name", [ $this, 'delete_user_id' ] );
+
         add_action( 'admin_menu', [ $this, 'add_options_page' ] );
         add_action( 'admin_init', [ $this, 'admin_init' ] );
         add_action( 'innocode_instagram_scheduled_refresh', [ $this, 'scheduled_refresh' ] );
         add_action( 'init', [ $this, 'schedule' ] );
+        add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
 
-        register_deactivation_hook( $this->get_file(), [ $this, 'deactivate' ] );
+        $file = $this->get_file();
+
+        register_activation_hook( $file, [ $this, 'activate' ] );
+        register_deactivation_hook( $file, [ $this, 'deactivate' ] );
     }
 
     /**
+     * Returns plugin __FILE__.
+     *
      * @return string
      */
     public function get_file()
@@ -88,6 +119,8 @@ final class Plugin
     }
 
     /**
+     * Returns APP ID.
+     *
      * @return string
      */
     public function get_client_id()
@@ -96,6 +129,8 @@ final class Plugin
     }
 
     /**
+     * Returns APP secret.
+     *
      * @return string
      */
     public function get_client_secret()
@@ -104,6 +139,8 @@ final class Plugin
     }
 
     /**
+     * Returns admin page.
+     *
      * @return OptionsPage
      */
     public function get_options_page()
@@ -112,6 +149,8 @@ final class Plugin
     }
 
     /**
+     * Returns query object.
+     *
      * @return Query
      */
     public function get_query()
@@ -120,6 +159,8 @@ final class Plugin
     }
 
     /**
+     * Returns Instagram client.
+     *
      * @return InstagramBasicDisplay
      */
     public function get_instagram()
@@ -128,6 +169,17 @@ final class Plugin
     }
 
     /**
+     * Returns REST controller.
+     * @return RESTController
+     */
+    public function get_rest_controller()
+    {
+        return $this->rest_controller;
+    }
+
+    /**
+     * Returns plugin path.
+     *
      * @return string
      */
     public function get_path()
@@ -136,6 +188,8 @@ final class Plugin
     }
 
     /**
+     * Returns plugin path to views dir.
+     *
      * @return string
      */
     public function get_views_dir()
@@ -144,6 +198,8 @@ final class Plugin
     }
 
     /**
+     * Returns plugin view file.
+     *
      * @param string $name
      * @return string
      */
@@ -153,17 +209,21 @@ final class Plugin
     }
 
     /**
+     * Returns redirect_uri parameter.
+     *
      * @return string
      */
     public function get_redirect_uri()
     {
         return apply_filters(
-            'innocode_instagram_auth_url',
+            'innocode_instagram_redirect_uri',
             $this->get_query()->url( 'auth' )
         );
     }
 
     /**
+     * Returns scope parameter.
+     *
      * @return array
      */
     public function get_scope()
@@ -175,6 +235,8 @@ final class Plugin
     }
 
     /**
+     * Returns state parameter.
+     *
      * @return array
      */
     public function get_state()
@@ -185,6 +247,9 @@ final class Plugin
         );
     }
 
+    /**
+     * User authorization.
+     */
     public function auth()
     {
         // WordPress clears $_GET['error'], so use $_REQUEST['error'] instead.
@@ -205,9 +270,17 @@ final class Plugin
 
         $state = isset( $_GET['state'] ) ? wp_unslash( $_GET['state'] ) : '';
 
+        if ( false === strpos( $state, ':' ) ) {
+            wp_die(
+                '<h1>' . __( 'Something went wrong.' ) . '</h1>' .
+                '<p>' . __( 'Invalid state.', 'innocode-instagram' ) . '</p>',
+                WP_Http::BAD_REQUEST
+            );
+        }
+
         list( $blog_id, $nonce ) = explode( ':', $state, 2 );
 
-        if ( ! $nonce || ! wp_verify_nonce( $nonce, 'innocode_instagram-auth' ) ) {
+        if ( ! wp_verify_nonce( $nonce, 'innocode_instagram-auth' ) ) {
             wp_die(
                 '<h1>' . __( 'This link has expired.' ) . '</h1>' .
                 '<p>' . __( 'Please try again.' ) . '</p>',
@@ -304,6 +377,24 @@ final class Plugin
         wp_redirect( $options_page_url );
     }
 
+    /**
+     * User deauthorization.
+     */
+    public function deauth()
+    {
+        $instagram = $this->get_instagram();
+        $access_token = $instagram->getAccessToken();
+
+        if ( $access_token ) {
+            $this->delete_all_data();
+        }
+
+        wp_redirect( $this->get_options_page()->get_admin_url() );
+    }
+
+    /**
+     * Creates admin page.
+     */
     private function init_options_page()
     {
         $this->options_page = new OptionsPage(
@@ -315,6 +406,9 @@ final class Plugin
         $this->options_page->set_view( 'options-page.php' );
     }
 
+    /**
+     * Creates admin page sections.
+     */
     private function init_sections()
     {
         $options_page = $this->get_options_page();
@@ -329,6 +423,9 @@ final class Plugin
         }
     }
 
+    /**
+     * Creates admin page fields.
+     */
     private function init_fields()
     {
         $options_page = $this->get_options_page();
@@ -386,6 +483,9 @@ final class Plugin
         }
     }
 
+    /**
+     * Create query object.
+     */
     private function init_query()
     {
         $this->query = new Query(
@@ -393,14 +493,14 @@ final class Plugin
                 ? INNOCODE_INSTAGRAM_ENDPOINT
                 : 'instagram'
         );
-        $this->query->add_route(
-            'auth',
-            [ $this, 'auth' ],
-            $this->get_options_page()->get_capability()
-        );
+        $capability = $this->get_options_page()->get_capability();
+        $this->query->add_route( 'auth', [ $this, 'auth' ], $capability );
+        $this->query->add_route( 'deauth', [ $this, 'deauth' ], $capability );
     }
 
     /**
+     * Creates Instagram client.
+     *
      * @throws InstagramBasicDisplayException
      */
     private function init_instagram()
@@ -421,6 +521,17 @@ final class Plugin
         }
     }
 
+    /**
+     * Creates REST controller.
+     */
+    private function init_rest_controller()
+    {
+        $this->rest_controller = new RESTController();
+    }
+
+    /**
+     * Adds rewrite endpoints.
+     */
     public function add_rewrite_endpoints()
     {
         $endpoint = $this->get_query()->get_endpoint();
@@ -431,11 +542,17 @@ final class Plugin
         );
     }
 
+    /**
+     * Handles request.
+     */
     public function handle_request()
     {
         $this->get_query()->handle_request();
     }
 
+    /**
+     * Adds admin page.
+     */
     public function add_options_page()
     {
         $options_page = $this->get_options_page();
@@ -454,17 +571,18 @@ final class Plugin
         );
     }
 
+    /**
+     * Adds admin page sections and fields.
+     */
     public function admin_init()
     {
         $this->add_sections();
         $this->add_fields();
-        $options_page_hook = $this->get_options_page()->get_hook();
-
-        add_action( "load-$options_page_hook", function () {
-            $this->verify_access_token();
-        } );
     }
 
+    /**
+     * Adds admin page sections.
+     */
     public function add_sections()
     {
         $options_page = $this->get_options_page();
@@ -480,6 +598,9 @@ final class Plugin
         }
     }
 
+    /**
+     * Adds admin page fields.
+     */
     public function add_fields()
     {
         $options_page = $this->get_options_page();
@@ -509,35 +630,9 @@ final class Plugin
         }
     }
 
-    // @TODO: move error check to REST and JS
-    public function verify_access_token()
-    {
-        $instagram = $this->get_instagram();
-        $access_token = $instagram->getAccessToken();
-
-        if ( ! $access_token ) {
-            $this->delete_all_data();
-
-            return;
-        }
-
-        $profile = $instagram->getUserProfile();
-
-        if ( isset( $profile->error ) ) {
-            add_action( 'admin_notices', function () use ( $profile ) {
-                $message = sprintf(
-                    '<b>%s:</b> %s',
-                    $profile->error->type,
-                    $profile->error->message
-                );
-                $file = $this->get_view_file( 'notice-error.php' );
-
-                require_once $file;
-            } );
-        }
-    }
-
     /**
+     * Deletes all data including token and profile.
+     *
      * @param int|null $blog_id
      */
     public function delete_all_data( int $blog_id = null )
@@ -549,14 +644,15 @@ final class Plugin
         }
     }
 
+    /**
+     * Refreshes token and profile data.
+     */
     public function scheduled_refresh()
     {
         $instagram = $this->get_instagram();
         $access_token = $instagram->getAccessToken();
 
         if ( ! $access_token ) {
-            $this->delete_all_data();
-
             return;
         }
 
@@ -594,6 +690,9 @@ final class Plugin
         }
     }
 
+    /**
+     * Schedules or unschedules refresh token and profile data action.
+     */
     public function schedule()
     {
         $instagram = $this->get_instagram();
@@ -617,6 +716,9 @@ final class Plugin
         }
     }
 
+    /**
+     * Unschedules refresh token and profile data action.
+     */
     public function unschedule()
     {
         if (
@@ -627,6 +729,72 @@ final class Plugin
         }
     }
 
+    /**
+     * Adds routes.
+     */
+    public function register_rest_routes()
+    {
+        $this->get_rest_controller()->register_routes();
+    }
+
+    /**
+     * Handles user_id setting create.
+     *
+     * @param string $option
+     * @param mixed  $value
+     */
+    public function add_user_id( string $option, $value )
+    {
+        if ( is_multisite() ) {
+            add_site_meta( get_current_blog_id(), $option, $value );
+        }
+
+        // @TODO: implement a possibility to store value globally to be able to use one endpoint per APP
+        // Probably we need to store user_id => siteurl[]
+    }
+
+    /**
+     * Handles user_id setting update.
+     *
+     * @param mixed  $old_value
+     * @param mixed  $value
+     * @param string $option
+     */
+    public function update_user_id( $old_value, $value, string $option )
+    {
+        if ( is_multisite() ) {
+            update_site_meta( get_current_blog_id(), $option, $value );
+        }
+
+        // @TODO: implement a possibility to store value globally to be able to use one endpoint per APP
+        // Probably we need to store user_id => siteurl[]
+    }
+
+    /**
+     * Handles user_id setting delete.
+     *
+     * @param string $option
+     */
+    public function delete_user_id( string $option )
+    {
+        if ( is_multisite() ) {
+            delete_site_meta( get_current_blog_id(), $option );
+        }
+
+        // @TODO: implement a possibility to store value globally to be able to use one endpoint per APP
+    }
+
+    /**
+     * Plugin activation action.
+     */
+    public function activate()
+    {
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Plugin deactivation action.
+     */
     public function deactivate()
     {
         $this->unschedule();

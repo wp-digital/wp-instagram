@@ -1,10 +1,10 @@
-# Instagram
+# Wordpress Instagram integration
 
 ### Description
 
 Enables Instagram API for developers.
 
-The idea of plugin is to use [Instagram-PHP-API](https://github.com/cosenary/Instagram-PHP-API)
+The idea of plugin is to use [Instagram-PHP-API](https://github.com/espresso-dev/instagram-basic-display-php)
 with ability to get access token through WordPress admin panel.
 
 ### Install
@@ -15,10 +15,7 @@ with ability to get access token through WordPress admin panel.
     composer require innocode-digital/wp-instagram
     ````
 
-    By default it will be installed as [Must Use Plugin](https://codex.wordpress.org/Must_Use_Plugins).
-    But it's possible to control with `extra.installer-paths` in `composer.json`.
-
-- Alternate way is to clone this repo to `wp-content/mu-plugins/` or `wp-content/plugins/`:
+- Alternate way is to clone this repo to `wp-content/plugins/`:
 
     ````
     cd wp-content/plugins/
@@ -27,29 +24,34 @@ with ability to get access token through WordPress admin panel.
     composer install
     ````
 
-If plugin was installed as regular plugin then activate **Instagram** from Plugins page 
-or [WP-CLI](https://make.wordpress.org/cli/handbook/): `wp plugin activate wp-instagram`.
+Activate **Instagram** with [WP-CLI](https://make.wordpress.org/cli/handbook/)
+`wp plugin activate wp-instagram` or from Plugins page.
 
 ### Usage
 
-1. Add required constants (usually to `wp-config.php`):
+1. Check [Facebook Manual](https://developers.facebook.com/docs/instagram-basic-display-api/getting-started) on how to
+create an APP.
+
+2. Add required constants (usually to `wp-config.php`):
 
     ````
     define( 'INSTAGRAM_CLIENT_ID', '' );
     define( 'INSTAGRAM_CLIENT_SECRET', '' );
     ````
     
-2. Add site auth URL `https://site.com/instagram/auth/ ` to **Valid redirect URIs** 
-in **Security** tab of client on [Instagram](https://www.instagram.com/developer/) 
+3. Add site auth URL `https://site.com/instagram/auth/ ` to **Valid OAuth Redirect URIs** in **Basic Display**.
 
-3. Open settings page in WordPress admin panel **Settings** -> **Instagram** 
+4. Open settings page in WordPress admin panel **Settings** -> **Instagram** 
 `/wp-admin/options-general.php?page=innocode-instagram`
 
-4. Click on **Log in** button or **Log in as another user** in case when should change
+5. Click on **Log in** button or **Log in as another user** in case when should change
 account.
 
-5. Start use [Instagram-PHP-API](https://github.com/cosenary/Instagram-PHP-API) through
+6. Start use [Instagram-PHP-API](https://github.com/cosenary/Instagram-PHP-API) through
 `innocode_instagram();` function. E.g. `innocode_instagram()->getUser();`.
+
+7. (optional) Add site deauth REST API endpoint `https://site.com/wp-json/innocode/v1/instagram/deauth` to
+**Deauthorize Callback URL** in **Basic Display**. 
 
 ### Notes
 
@@ -70,7 +72,7 @@ define( 'INNOCODE_INSTAGRAM_ENDPOINT', '' );
 It's possible to change full auth URL:
 
 ````
-add_filter( 'innocode_instagram_auth_url', function ( $url ) {
+add_filter( 'innocode_instagram_redirect_uri', function ( string $url ) {
     return $url;
 } );
 ````
@@ -81,7 +83,17 @@ It's possible to change Instagram permission:
 
 ````
 add_filter( 'innocode_instagram_scope', function ( array $scope ) {
-    return $scope; // Default is array containing 'basic'.
+    return $scope; // Default is array containing 'user_profile' and 'user_media'.
+} );
+````
+
+---
+
+It's possible to change state parameter which is sending with auth request:
+
+````
+add_filter( 'innocode_instagram_state', function ( string $state ) {
+    return $scope; // Default is string in format '$blog_id:$nonce'.
 } );
 ````
 

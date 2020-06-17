@@ -9,10 +9,12 @@ namespace Innocode\Instagram;
 final class Query
 {
     /**
+     * Base endpoint.
      * @var string
      */
-    private $endpoint ;
+    private $endpoint;
     /**
+     * Routes collection.
      * @var array
      */
     private $routes = [];
@@ -27,6 +29,8 @@ final class Query
     }
 
     /**
+     * Returns base endpoint.
+     *
      * @return string
      */
     public function get_endpoint()
@@ -35,6 +39,8 @@ final class Query
     }
 
     /**
+     * Returns routes collection.
+     *
      * @return array
      */
     public function get_routes()
@@ -43,16 +49,26 @@ final class Query
     }
 
     /**
+     * Adds route to collection.
+     *
      * @param string      $uri
      * @param callable    $callback
      * @param string|null $capability
      */
     public function add_route( string $uri, callable $callback, string $capability = null )
     {
-        $this->routes[ $uri ] = [ $callback, $capability ];
+        $route = new Route( $callback );
+
+        if ( ! is_null( $capability ) ) {
+            $route->set_capability( $capability );
+        }
+
+        $this->routes[ $uri ] = $route;
     }
 
     /**
+     * Returns endpoint.
+     *
      * @param string $uri
      * @return string
      */
@@ -62,6 +78,8 @@ final class Query
     }
 
     /**
+     * Returns URL.
+     *
      * @param string $uri
      * @return string
      */
@@ -73,6 +91,9 @@ final class Query
         );
     }
 
+    /**
+     * Handles request.
+     */
     public function handle_request()
     {
         $endpoint = $this->get_endpoint();
@@ -84,16 +105,8 @@ final class Query
 
         $routes = $this->get_routes();
 
-        if (
-            isset( $routes[ $uri ] ) &&
-            (
-                ! isset( $routes[ $uri ][1] ) ||
-                current_user_can( $routes[ $uri ][1] )
-            )
-        ) {
-            $routes[ $uri ][0]();
-
-            exit;
+        if ( isset( $routes[ $uri ] ) ) {
+            $routes[ $uri ]();
         }
     }
 }
