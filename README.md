@@ -24,7 +24,7 @@ with ability to get access token through WordPress admin panel.
     composer install
     ````
 
-Activate **WordPress Instagram integration** with [WP-CLI](https://make.wordpress.org/cli/handbook/)
+Activate **WordPress Instagram Basic Display integration** with [WP-CLI](https://make.wordpress.org/cli/handbook/)
 `wp plugin activate wp-instagram` or from **Plugins** page.
 
 ### Usage
