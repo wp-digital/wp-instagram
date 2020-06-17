@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: WordPress Instagram integration
- * Description: Enables Instagram API for developers.
+ * Plugin Name: WordPress Instagram Basic Display integration
+ * Description: Enables Instagram Basic Display API for developers.
  * Version: 2.0.0
  * Author: Innocode
  * Author URI: https://innocode.com

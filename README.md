@@ -1,10 +1,10 @@
-# WordPress Instagram integration
+# WordPress Instagram Basic Display integration
 
 ### Description
 
-Enables Instagram API for developers.
+Enables **Instagram Basic Display API** for developers.
 
-The idea of plugin is to use [Instagram Basic Display PHP API](https://github.com/espresso-dev/instagram-basic-display-php)
+The idea of the plugin is to use [Instagram Basic Display PHP API](https://github.com/espresso-dev/instagram-basic-display-php)
 with ability to get access token through WordPress admin panel.
 
 ### Install
@@ -24,8 +24,8 @@ with ability to get access token through WordPress admin panel.
     composer install
     ````
 
-Activate **Instagram** with [WP-CLI](https://make.wordpress.org/cli/handbook/)
-`wp plugin activate wp-instagram` or from Plugins page.
+Activate **WordPress Instagram integration** with [WP-CLI](https://make.wordpress.org/cli/handbook/)
+`wp plugin activate wp-instagram` or from **Plugins** page.
 
 ### Usage
 
@@ -48,15 +48,16 @@ create an APP.
 account.
 
 6. Start use [Instagram Basic Display PHP API](https://github.com/cosenary/Instagram-PHP-API) through
-`innocode_instagram();` function. E.g. `innocode_instagram()->getUserProfile();`.
+`innocode_instagram();` function e.g. `innocode_instagram()->getUserProfile();`.
 
-7. (optional) Add site deauth REST API endpoint `https://site.com/wp-json/innocode/v1/instagram/deauth` to
+7. (optional) Set site deauth REST API endpoint `https://site.com/wp-json/innocode/v1/instagram/deauth` in
 **Deauthorize Callback URL** in **Basic Display**. 
 
 ### Notes
 
 If site is a part of [Multisite](https://wordpress.org/support/article/create-a-network/)
-then main site auth URL should be added in **Valid redirect URIs**.
+then main site auth URL should be added in **Valid redirect URIs**. So, plugin should be active on all network or
+at least on the main site.
 
 ### Documentation
 
