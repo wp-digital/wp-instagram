@@ -30,7 +30,6 @@ final class Query
 
     /**
      * Returns base endpoint.
-     *
      * @return string
      */
     public function get_endpoint()
@@ -40,7 +39,6 @@ final class Query
 
     /**
      * Returns routes collection.
-     *
      * @return array
      */
     public function get_routes()
@@ -50,12 +48,11 @@ final class Query
 
     /**
      * Adds route to collection.
-     *
-     * @param string      $uri
+     * @param string      $name
      * @param callable    $callback
      * @param string|null $capability
      */
-    public function add_route( string $uri, callable $callback, string $capability = null )
+    public function add_route( string $name, callable $callback, string $capability = null )
     {
         $route = new Route( $callback );
 
@@ -63,30 +60,28 @@ final class Query
             $route->set_capability( $capability );
         }
 
-        $this->routes[ $uri ] = $route;
+        $this->routes[ $name ] = $route;
     }
 
     /**
      * Returns endpoint.
-     *
-     * @param string $uri
+     * @param string $path
      * @return string
      */
-    public function path( string $uri )
+    public function path( string $path )
     {
-        return "/{$this->get_endpoint()}/$uri/";
+        return "/{$this->get_endpoint()}/" . trim( $path, '/' ) . '/';
     }
 
     /**
      * Returns URL.
-     *
-     * @param string $uri
+     * @param string $route
      * @return string
      */
-    public function url( string $uri )
+    public function url( string $route )
     {
         return network_home_url(
-            $this->path( $uri ),
+            $this->path( $route ),
             is_ssl() ? 'https' : 'http'
         );
     }
@@ -97,16 +92,16 @@ final class Query
     public function handle_request()
     {
         $endpoint = $this->get_endpoint();
-        $uri = get_query_var( $endpoint, null );
+        $route = get_query_var( $endpoint, null );
 
-        if ( is_null( $uri ) ) {
+        if ( is_null( $route ) ) {
             return;
         }
 
         $routes = $this->get_routes();
 
-        if ( isset( $routes[ $uri ] ) ) {
-            $routes[ $uri ]();
+        if ( isset( $routes[ $route ] ) ) {
+            $routes[ $route ]();
         }
     }
 }

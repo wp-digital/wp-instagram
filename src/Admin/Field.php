@@ -41,7 +41,6 @@ class Field
 
     /**
      * Returns setting.
-     *
      * @return Setting
      */
     public function get_setting()
@@ -51,7 +50,6 @@ class Field
 
     /**
      * Sets setting.
-     *
      * @param Setting $setting
      */
     public function set_setting( Setting $setting )
@@ -61,7 +59,6 @@ class Field
 
     /**
      * Returns type.
-     *
      * @return string
      */
     public function get_type()
@@ -71,7 +68,6 @@ class Field
 
     /**
      * Sets type.
-     *
      * @param string $type
      */
     public function set_type( string $type )
@@ -81,7 +77,6 @@ class Field
 
     /**
      * Returns ID.
-     *
      * @return string
      */
     public function get_id()
@@ -91,7 +86,6 @@ class Field
 
     /**
      * Sets ID.
-     *
      * @param string $id
      */
     public function set_id( string $id )
@@ -101,7 +95,6 @@ class Field
 
     /**
      * Returns attributes.
-     *
      * @return array
      */
     public function get_attrs()
@@ -113,7 +106,6 @@ class Field
 
     /**
      * Sets attributes.
-     *
      * @param array $attrs
      */
     public function set_attrs( array $attrs )
@@ -123,7 +115,6 @@ class Field
 
     /**
      * Returns attributes HTML string.
-     *
      * @return string
      */
     public function get_attrs_html()
@@ -135,7 +126,6 @@ class Field
 
     /**
      * Adds attribute.
-     *
      * @param string $name
      * @param string $value
      */
@@ -146,7 +136,6 @@ class Field
 
     /**
      * Returns callback.
-     *
      * @return callable
      */
     public function get_callback()
@@ -156,7 +145,6 @@ class Field
 
     /**
      * Sets callback.
-     *
      * @param callable $callback
      */
     public function set_callback( callable $callback )
@@ -166,7 +154,6 @@ class Field
 
     /**
      * Returns description.
-     *
      * @return string
      */
     public function get_description()
@@ -176,7 +163,6 @@ class Field
 
     /**
      * Sets description.
-     *
      * @param string $description
      */
     public function set_description( string $description )
@@ -186,7 +172,6 @@ class Field
 
     /**
      * Returns HTML element.
-     *
      * @return string
      */
     public function get_html()

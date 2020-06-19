@@ -59,6 +59,9 @@ If site is a part of [Multisite](https://wordpress.org/support/article/create-a-
 then main site auth URL should be added in **Valid OAuth Redirect URIs**.
 So, plugin should be active on all network or at least on the main site additionally.
 
+Plugin adds daily cron job after authorization. So, please be sure cron functionality works.
+The token tries to update 3 days before the expiration, user profile data updated daily.
+
 ### Documentation
 
 By default, endpoint auth URL is using `instagram` as endpoint, but it's possible to

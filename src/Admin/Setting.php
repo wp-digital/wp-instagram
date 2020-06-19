@@ -44,7 +44,6 @@ class Setting
 
     /**
      * Returns name.
-     *
      * @return string
      */
     public function get_name()
@@ -54,7 +53,6 @@ class Setting
 
     /**
      * Returns title.
-     *
      * @return string
      */
     public function get_title()
@@ -64,7 +62,6 @@ class Setting
 
     /**
      * Sets argument.
-     *
      * @param string $name
      * @param mixed  $value
      */
@@ -75,7 +72,6 @@ class Setting
 
     /**
      * Returns argument.
-     *
      * @param string $name
      * @return mixed
      */
@@ -96,7 +92,6 @@ class Setting
 
     /**
      * Returns arguments.
-     *
      * @return array
      */
     public function get_args()
@@ -109,7 +104,6 @@ class Setting
 
     /**
      * Retrieves option.
-     *
      * @param mixed    $default
      * @param int|null $blog_id
      * @return bool|mixed
@@ -125,7 +119,6 @@ class Setting
 
     /**
      * Updates option.
-     *
      * @param mixed    $value
      * @param int|null $blog_id
      */
@@ -140,7 +133,6 @@ class Setting
 
     /**
      * Deletes option.
-     *
      * @param int|null $blog_id
      */
     public function delete_value( int $blog_id = null )

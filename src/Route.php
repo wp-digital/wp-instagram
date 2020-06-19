@@ -30,7 +30,6 @@ class Route
 
     /**
      * Returns callback.
-     *
      * @return callable
      */
     public function get_callback()
@@ -40,7 +39,6 @@ class Route
 
     /**
      * Sets capability.
-     *
      * @param string $capability
      */
     public function set_capability( string $capability )
@@ -50,7 +48,6 @@ class Route
 
     /**
      * Returns capability.
-     *
      * @return string
      */
     public function get_capability()

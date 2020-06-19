@@ -37,7 +37,6 @@ class Section
 
     /**
      * Returns name.
-     *
      * @return string
      */
     public function get_name()
@@ -47,7 +46,6 @@ class Section
 
     /**
      * Returns title.
-     *
      * @return string
      */
     public function get_title()
@@ -57,7 +55,6 @@ class Section
 
     /**
      * Returns fields.
-     *
      * @return Field[]
      */
     public function get_fields()
@@ -67,7 +64,6 @@ class Section
 
     /**
      * Adds field.
-     *
      * @param string $name
      * @param Field  $field
      */

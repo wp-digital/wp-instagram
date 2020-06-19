@@ -20,12 +20,12 @@ final class Plugin
     const SECTION_USER = 'user';
 
     /**
-     * APP ID.
+     * App ID.
      * @var string
      */
     private $client_id;
     /**
-     * APP secret.
+     * App secret.
      * @var string
      */
     private $client_secret;
@@ -54,6 +54,11 @@ final class Plugin
      * @var RESTController
      */
     private $rest_controller;
+    /**
+     * App site.
+     * @var AppSite
+     */
+    private $app_site;
 
     /**
      * Plugin constructor.
@@ -94,7 +99,7 @@ final class Plugin
 
         add_action( "add_option_$user_id_setting_name", [ $this, 'add_user_id' ], 10, 2 );
         add_action( "update_option_$user_id_setting_name", [ $this, 'update_user_id' ], 10, 3 );
-        add_action( "delete_option_$user_id_setting_name", [ $this, 'delete_user_id' ] );
+        add_action( 'delete_option', [ $this, 'delete_user_id' ] );
 
         add_action( 'admin_menu', [ $this, 'add_options_page' ] );
         add_action( 'admin_init', [ $this, 'admin_init' ] );
@@ -110,7 +115,6 @@ final class Plugin
 
     /**
      * Returns plugin __FILE__.
-     *
      * @return string
      */
     public function get_file()
@@ -119,8 +123,7 @@ final class Plugin
     }
 
     /**
-     * Returns APP ID.
-     *
+     * Returns app ID.
      * @return string
      */
     public function get_client_id()
@@ -129,8 +132,7 @@ final class Plugin
     }
 
     /**
-     * Returns APP secret.
-     *
+     * Returns app secret.
      * @return string
      */
     public function get_client_secret()
@@ -140,7 +142,6 @@ final class Plugin
 
     /**
      * Returns admin page.
-     *
      * @return OptionsPage
      */
     public function get_options_page()
@@ -150,7 +151,6 @@ final class Plugin
 
     /**
      * Returns query object.
-     *
      * @return Query
      */
     public function get_query()
@@ -160,7 +160,6 @@ final class Plugin
 
     /**
      * Returns Instagram client.
-     *
      * @return InstagramBasicDisplay
      */
     public function get_instagram()
@@ -178,8 +177,16 @@ final class Plugin
     }
 
     /**
+     * Returns app site.
+     * @return string
+     */
+    public function get_app_site()
+    {
+        return $this->app_site;
+    }
+
+    /**
      * Returns plugin path.
-     *
      * @return string
      */
     public function get_path()
@@ -189,7 +196,6 @@ final class Plugin
 
     /**
      * Returns plugin path to views dir.
-     *
      * @return string
      */
     public function get_views_dir()
@@ -199,7 +205,6 @@ final class Plugin
 
     /**
      * Returns plugin view file.
-     *
      * @param string $name
      * @return string
      */
@@ -210,7 +215,6 @@ final class Plugin
 
     /**
      * Returns redirect_uri parameter.
-     *
      * @return string
      */
     public function get_redirect_uri()
@@ -223,7 +227,6 @@ final class Plugin
 
     /**
      * Returns scope parameter.
-     *
      * @return array
      */
     public function get_scope()
@@ -236,7 +239,6 @@ final class Plugin
 
     /**
      * Returns state parameter.
-     *
      * @return array
      */
     public function get_state()
@@ -500,7 +502,6 @@ final class Plugin
 
     /**
      * Creates Instagram client.
-     *
      * @throws InstagramBasicDisplayException
      */
     private function init_instagram()
@@ -527,6 +528,15 @@ final class Plugin
     private function init_rest_controller()
     {
         $this->rest_controller = new RESTController();
+    }
+
+    /**
+     * Sets app site.
+     * @param string $url
+     */
+    public function init_app_site( string $url )
+    {
+        $this->app_site = new AppSite( $url );
     }
 
     /**
@@ -632,7 +642,6 @@ final class Plugin
 
     /**
      * Deletes all data including token and profile.
-     *
      * @param int|null $blog_id
      */
     public function delete_all_data( int $blog_id = null )
@@ -734,12 +743,17 @@ final class Plugin
      */
     public function register_rest_routes()
     {
-        $this->get_rest_controller()->register_routes();
+        $rest_controller = $this->get_rest_controller();
+        $rest_controller->register_routes();
+        $app_site = $this->get_app_site();
+
+        if ( $app_site && $app_site->is_current_site() ) {
+            $rest_controller->register_app_site_routes();
+        }
     }
 
     /**
      * Handles user_id setting create.
-     *
      * @param string $option
      * @param mixed  $value
      */
@@ -749,13 +763,15 @@ final class Plugin
             add_site_meta( get_current_blog_id(), $option, $value );
         }
 
-        // @TODO: implement a possibility to store value globally to be able to use one endpoint per APP
-        // Probably we need to store user_id => siteurl[]
+        $app_site = $this->get_app_site();
+
+        if ( $app_site && ! $app_site->is_current_site() ) {
+            $app_site->add_current_site( $value );
+        }
     }
 
     /**
      * Handles user_id setting update.
-     *
      * @param mixed  $old_value
      * @param mixed  $value
      * @param string $option
@@ -766,22 +782,37 @@ final class Plugin
             update_site_meta( get_current_blog_id(), $option, $value );
         }
 
-        // @TODO: implement a possibility to store value globally to be able to use one endpoint per APP
-        // Probably we need to store user_id => siteurl[]
+        $app_site = $this->get_app_site();
+
+        if ( $app_site && ! $app_site->is_current_site() ) {
+            $app_site->update_current_site( $value, $old_value );
+        }
     }
 
     /**
      * Handles user_id setting delete.
-     *
      * @param string $option
      */
     public function delete_user_id( string $option )
     {
+        $user_id_setting = $this->get_options_page()
+            ->get_sections()[ static::SECTION_USER ]
+            ->get_fields()['id']
+            ->get_setting();
+
+        if ( $option != $user_id_setting->get_name() ) {
+            return;
+        }
+
         if ( is_multisite() ) {
             delete_site_meta( get_current_blog_id(), $option );
         }
 
-        // @TODO: implement a possibility to store value globally to be able to use one endpoint per APP
+        $app_site = $this->get_app_site();
+
+        if ( $app_site && ! $app_site->is_current_site() ) {
+            $app_site->delete_current_site( $user_id_setting->get_value() );
+        }
     }
 
     /**

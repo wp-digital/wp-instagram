@@ -5,7 +5,6 @@
  * Version: 2.0.0
  * Author: Innocode
  * Author URI: https://innocode.com
- * Requires at least: 4.9
  * Tested up to: 5.4.2
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -26,6 +25,11 @@ if ( defined( 'INSTAGRAM_CLIENT_ID' ) && defined( 'INSTAGRAM_CLIENT_SECRET' ) ) 
         INSTAGRAM_CLIENT_SECRET,
         __FILE__
     );
+
+    if ( defined( 'INNOCODE_INSTAGRAM_APP_SITE' ) ) {
+        $GLOBALS['innocode_instagram']->init_app_site( INNOCODE_INSTAGRAM_APP_SITE );
+    }
+
     $GLOBALS['innocode_instagram']->run();
 }
 

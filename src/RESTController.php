@@ -26,6 +26,16 @@ class RESTController extends WP_REST_Controller
     }
 
     /**
+     * Returns endpoint.
+     * @param string $path
+     * @return string
+     */
+    public function path( string $path )
+    {
+        return "/wp-json/$this->namespace/$this->rest_base/" . ltrim( $path, '/' );
+    }
+
+    /**
      * Adds routes.
      */
     public function register_routes()
@@ -41,9 +51,41 @@ class RESTController extends WP_REST_Controller
         );
     }
 
+    public function register_app_site_routes()
+    {
+        register_rest_route(
+            $this->namespace,
+            "/$this->rest_base/site",
+            [
+                'methods'  => WP_REST_Server::CREATABLE,
+                'callback' => [ $this, 'create_site' ],
+                'args'     => $this->get_endpoint_args_for_signed_request(),
+            ]
+        );
+
+        register_rest_route(
+            $this->namespace,
+            "/$this->rest_base/site",
+            [
+                'methods'  => WP_REST_Server::EDITABLE,
+                'callback' => [ $this, 'update_site' ],
+                'args'     => $this->get_endpoint_args_for_signed_request(),
+            ]
+        );
+
+        register_rest_route(
+            $this->namespace,
+            "/$this->rest_base/site",
+            [
+                'methods'  => WP_REST_Server::DELETABLE,
+                'callback' => [ $this, 'delete_site' ],
+                'args'     => $this->get_endpoint_args_for_signed_request(),
+            ]
+        );
+    }
+
     /**
      * Returns array of endpoint arguments for signed request.
-     *
      * @return array[]
      */
     public function get_endpoint_args_for_signed_request()
@@ -63,7 +105,6 @@ class RESTController extends WP_REST_Controller
 
     /**
      * Checks signed request with minimum rules without parsing.
-     *
      * @param string $signed_request
      * @return bool
      */
@@ -74,50 +115,57 @@ class RESTController extends WP_REST_Controller
 
     /**
      * User deauthorization callback.
-     *
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
     public function deauth( WP_REST_Request $request )
     {
+        $signed_request = $this->get_signed_request( $request );
+
+        if ( is_wp_error( $signed_request ) ) {
+            return $signed_request;
+        }
+
         /**
          * @var Plugin $innocode_instagram
          */
         global $innocode_instagram;
 
-        $secret = $innocode_instagram->get_client_secret();
+        $app_site = $innocode_instagram->get_app_site();
 
-        if ( ! $secret ) {
-            return new WP_Error(
-                'rest_innocode_instagram_invalid_secret',
-                __( 'Invalid APP secret.', 'innocode-instagram' ),
-                [
-                    'status' => WP_Http::INTERNAL_SERVER_ERROR,
-                ]
-            );
+        if ( $app_site && $app_site->is_current_site() ) {
+            $urls = $app_site->get_sites_storage()
+                ->get( $signed_request['user_id'] );
+
+            foreach ( $urls as $url ) {
+                wp_remote_post(
+                    "$url{$this->path( 'deauth' )}",
+                    [
+                        'blocking'  => false,
+                        'body'      => [
+                            'signed_request' => $request->get_param( 'signed_request' ),
+                        ],
+                        'sslverify' => false,
+                    ]
+                );
+            }
         }
 
-        $parsed_signed_request = Helpers::parse_signed_request(
-            $request->get_param( 'signed_request' ),
-            $innocode_instagram->get_client_secret()
-        );
+        $user_id_setting = $innocode_instagram->get_options_page()
+            ->get_sections()[ Plugin::SECTION_USER ]
+            ->get_fields()['id']
+            ->get_setting();
+        $user_id = (string) $signed_request['user_id'];
 
-        if ( is_wp_error( $parsed_signed_request ) ) {
-            $parsed_signed_request->add_data( [
-                'status' => WP_Http::FORBIDDEN,
+        if ( ! is_multisite() ) {
+            if ( $user_id_setting->get_value() == $user_id ) {
+                $innocode_instagram->delete_all_data();
+            }
+
+            return rest_ensure_response( [
+                'user_id' => $user_id,
+                'url'     => home_url(),
             ] );
-
-            return $parsed_signed_request;
-        }
-
-        if ( empty( $parsed_signed_request['user_id'] ) ) {
-            return new WP_Error(
-                'rest_innocode_instagram_invalid_signed_request',
-                __( 'Invalid signed request.', 'innocode-instagram' ),
-                [
-                    'status' => WP_Http::INTERNAL_SERVER_ERROR,
-                ]
-            );
         }
 
         /**
@@ -126,22 +174,148 @@ class RESTController extends WP_REST_Controller
         $sites = get_sites( [
             'meta_query' => [
                 [
-                    'key'   => $innocode_instagram->get_options_page()
-                        ->get_sections()[ Plugin::SECTION_USER ]
-                        ->get_fields()['id']
-                        ->get_setting()
-                        ->get_name(),
-                    'value' => $parsed_signed_request['user_id'],
+                    'key'   => $user_id_setting->get_name(),
+                    'value' => $user_id,
                 ],
             ],
         ] );
-        $response = [];
+        $response = [
+            'user_id' => $user_id,
+            'url'     => [],
+        ];
 
         foreach ( $sites as $site ) {
             $innocode_instagram->delete_all_data( $site->blog_id );
-            $response[ $site->blog_id ] = $site->domain;
+            $response['url'][] = $site->home;
         }
 
         return rest_ensure_response( $response );
+    }
+
+    /**
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function create_site( WP_REST_Request $request )
+    {
+        $signed_request = $this->get_site_signed_request( $request );
+
+        if ( is_wp_error( $signed_request ) ) {
+            return $signed_request;
+        }
+
+        /**
+         * @var Plugin $innocode_instagram
+         */
+        global $innocode_instagram;
+
+        $user_id = (string) $signed_request['user_id'];
+        $url = untrailingslashit( esc_url_raw( (string) $signed_request['url'] ) );
+        $innocode_instagram->get_app_site()
+            ->get_sites_storage()
+            ->add( $user_id, $url );
+
+        return rest_ensure_response( [
+            'user_id' => $user_id,
+            'url'     => $url,
+        ] );
+    }
+
+    public function update_site( WP_REST_Request $request )
+    {
+
+    }
+
+    /**
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|WP_Error
+     */
+    public function delete_site( WP_REST_Request $request )
+    {
+        $signed_request = $this->get_site_signed_request( $request );
+
+        if ( is_wp_error( $signed_request ) ) {
+            return $signed_request;
+        }
+
+        /**
+         * @var Plugin $innocode_instagram
+         */
+        global $innocode_instagram;
+
+        $user_id = (string) $signed_request['user_id'];
+        $url = untrailingslashit( esc_url_raw( (string) $signed_request['url'] ) );
+        $innocode_instagram->get_app_site()
+            ->get_sites_storage()
+            ->remove( $user_id, $url );
+
+        return rest_ensure_response( [
+            'user_id' => $user_id,
+            'url'     => $url,
+        ] );
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     * @return array|WP_Error
+     */
+    protected function get_signed_request( WP_REST_Request $request )
+    {
+        /**
+         * @var Plugin $innocode_instagram
+         */
+        global $innocode_instagram;
+
+        $signed_request = Helpers::parse_signed_request(
+            $request->get_param( 'signed_request' ),
+            $innocode_instagram->get_client_secret()
+        );
+
+        if ( is_wp_error( $signed_request ) ) {
+            $signed_request->add_data( [
+                'status' => WP_Http::FORBIDDEN,
+            ] );
+
+            return $signed_request;
+        }
+
+        if ( empty( $signed_request['user_id'] ) ) {
+            return new WP_Error(
+                'rest_innocode_instagram_invalid_signed_request',
+                __( 'Invalid signed request.', 'innocode-instagram' ),
+                [
+                    'status' => WP_Http::BAD_REQUEST,
+                ]
+            );
+        }
+
+        return $signed_request;
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     * @return array|WP_Error
+     */
+    protected function get_site_signed_request( WP_REST_Request $request )
+    {
+        $signed_request = $this->get_signed_request( $request );
+
+        if ( is_wp_error( $signed_request ) ) {
+            return $signed_request;
+        }
+
+        if ( empty( $signed_request['url'] ) ) {
+            return new WP_Error(
+                'rest_innocode_instagram_invalid_signed_request',
+                __( 'Invalid signed request.', 'innocode-instagram' ),
+                [
+                    'status' => WP_Http::BAD_REQUEST,
+                ]
+            );
+        }
+
+        return $signed_request;
     }
 }

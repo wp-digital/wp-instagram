@@ -60,7 +60,6 @@ class OptionsPage
 
     /**
      * Returns name.
-     *
      * @return string
      */
     public function get_name()
@@ -70,7 +69,6 @@ class OptionsPage
 
     /**
      * Returns menu slug.
-     *
      * @return string
      */
     public function get_menu_slug()
@@ -80,7 +78,6 @@ class OptionsPage
 
     /**
      * Returns title.
-     *
      * @return string
      */
     public function get_title()
@@ -90,7 +87,6 @@ class OptionsPage
 
     /**
      * Returns menu title.
-     *
      * @return string
      */
     public function get_menu_title()
@@ -100,7 +96,6 @@ class OptionsPage
 
     /**
      * Sets menu title.
-     *
      * @param string $menu_title
      */
     public function set_menu_title( string $menu_title )
@@ -110,7 +105,6 @@ class OptionsPage
 
     /**
      * Returns capability.
-     *
      * @return string
      */
     public function get_capability()
@@ -120,7 +114,6 @@ class OptionsPage
 
     /**
      * Sets capability.
-     *
      * @param string $capability
      */
     public function set_capability( string $capability )
@@ -130,7 +123,6 @@ class OptionsPage
 
     /**
      * Returns view file name.
-     *
      * @return string
      */
     public function get_view()
@@ -140,7 +132,6 @@ class OptionsPage
 
     /**
      * Sets view file name.
-     *
      * @param string $view
      */
     public function set_view( string $view )
@@ -150,7 +141,6 @@ class OptionsPage
 
     /**
      * Returns sections collection.
-     *
      * @return Section[]
      */
     public function get_sections()
@@ -160,7 +150,6 @@ class OptionsPage
 
     /**
      * Adds section.
-     *
      * @param string  $name
      * @param Section $section
      */
@@ -171,7 +160,6 @@ class OptionsPage
 
     /**
      * Returns admin page URL.
-     *
      * @param int|null $blog_id
      * @return string
      */
@@ -182,7 +170,6 @@ class OptionsPage
 
     /**
      * Checks whether page has at least one field which is not disabled.
-     *
      * @return bool
      */
     public function has_enabled_fields()
