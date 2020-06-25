@@ -86,10 +86,8 @@ final class Plugin
      */
     public function run()
     {
-        if ( is_main_site() ) {
-            add_action( 'init', [ $this, 'add_rewrite_endpoints' ] );
-            add_action( 'template_redirect', [ $this, 'handle_request' ] );
-        }
+        add_action( 'init', [ $this, 'add_rewrite_endpoints' ] );
+        add_action( 'template_redirect', [ $this, 'handle_request' ] );
 
         $user_id_setting_name = $this->get_options_page()
             ->get_sections()[ static::SECTION_USER ]
