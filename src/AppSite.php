@@ -145,15 +145,16 @@ final class AppSite
 
     /**
      *
-     * @param string $user_id
      * @param string $previous_user_id
+     * @param string $user_id
      * @return array|WP_Error
      */
-    public function update_current_site( string $user_id, string $previous_user_id )
+    public function update_current_site( string $previous_user_id, string $user_id )
     {
         return $this->site_signed_request( 'POST', [
-            'user_id' => $user_id,
-            'url'     => home_url(),
+            'previous_user_id' => $previous_user_id,
+            'user_id'          => $user_id,
+            'url'              => home_url(),
         ] );
     }
 

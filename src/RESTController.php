@@ -222,9 +222,36 @@ class RESTController extends WP_REST_Controller
         ] );
     }
 
+    /**
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|WP_Error
+     */
     public function update_site( WP_REST_Request $request )
     {
+        $signed_request = $this->get_site_signed_request( $request );
 
+        if ( is_wp_error( $signed_request ) ) {
+            return $signed_request;
+        }
+
+        /**
+         * @var Plugin $innocode_instagram
+         */
+        global $innocode_instagram;
+
+        $previous_user_id = (string) $signed_request['previous_user_id'];
+        $user_id = (string) $signed_request['user_id'];
+        $url = untrailingslashit( esc_url_raw( (string) $signed_request['url'] ) );
+        $innocode_instagram->get_app_site()
+            ->get_sites_storage()
+            ->move( $previous_user_id, $user_id, $url );
+
+        return rest_ensure_response( [
+            'previous_user_id' => $previous_user_id,
+            'user_id'          => $user_id,
+            'url'              => $url,
+        ] );
     }
 
     /**

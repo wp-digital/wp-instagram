@@ -785,7 +785,7 @@ final class Plugin
         $app_site = $this->get_app_site();
 
         if ( $app_site && ! $app_site->is_current_site() ) {
-            $app_site->update_current_site( $value, $old_value );
+            $app_site->update_current_site( $old_value, $value );
         }
     }
 
