@@ -110,7 +110,7 @@ class RESTController extends WP_REST_Controller
      */
     public function check_signed_request( string $signed_request )
     {
-        return false !== strpos( $signed_request, ':' );
+        return false !== strpos( $signed_request, '.' );
     }
 
     /**
