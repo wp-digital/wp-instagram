@@ -76,14 +76,17 @@ final class Query
     /**
      * Returns URL.
      * @param string $route
+     * @param bool   $main_site
      * @return string
      */
-    public function url( string $route )
+    public function url( string $route, bool $main_site = true )
     {
-        return network_home_url(
-            $this->path( $route ),
-            is_ssl() ? 'https' : 'http'
-        );
+        $path = $this->path( $route );
+        $scheme = is_ssl() ? 'https' : 'http';
+
+        return $main_site
+            ? network_home_url( $path, $scheme )
+            : home_url( $path, $scheme );
     }
 
     /**
