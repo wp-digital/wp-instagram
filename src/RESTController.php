@@ -58,7 +58,7 @@ class RESTController extends WP_REST_Controller
     {
         register_rest_route(
             $this->namespace,
-            "/$this->rest_base/site",
+            "/$this->rest_base/sites",
             [
                 'methods'  => WP_REST_Server::EDITABLE,
                 'callback' => [ $this, 'update_site' ],
@@ -68,7 +68,7 @@ class RESTController extends WP_REST_Controller
 
         register_rest_route(
             $this->namespace,
-            "/$this->rest_base/site",
+            "/$this->rest_base/sites",
             [
                 'methods'  => WP_REST_Server::DELETABLE,
                 'callback' => [ $this, 'delete_site' ],
