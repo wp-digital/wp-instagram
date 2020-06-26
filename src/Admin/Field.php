@@ -9,31 +9,38 @@ namespace Innocode\Instagram\Admin;
 class Field
 {
     /**
+     * Setting.
      * @var Setting
      */
     protected $setting;
     /**
+     * Type.
      * @var string
      */
     protected $type = 'text';
     /**
+     * ID.
      * @var string
      */
     protected $id;
     /**
+     * Attributes.
      * @var array
      */
     protected $attrs = [];
     /**
+     * Render callback.
      * @var callable
      */
     protected $callback;
     /**
+     * Description.
      * @var string
      */
     protected $description;
 
     /**
+     * Returns setting.
      * @return Setting
      */
     public function get_setting()
@@ -42,6 +49,7 @@ class Field
     }
 
     /**
+     * Sets setting.
      * @param Setting $setting
      */
     public function set_setting( Setting $setting )
@@ -50,6 +58,7 @@ class Field
     }
 
     /**
+     * Returns type.
      * @return string
      */
     public function get_type()
@@ -58,14 +67,16 @@ class Field
     }
 
     /**
+     * Sets type.
      * @param string $type
      */
-    public function set_type( $type )
+    public function set_type( string $type )
     {
         $this->type = $type;
     }
 
     /**
+     * Returns ID.
      * @return string
      */
     public function get_id()
@@ -74,14 +85,16 @@ class Field
     }
 
     /**
+     * Sets ID.
      * @param string $id
      */
-    public function set_id( $id )
+    public function set_id( string $id )
     {
         $this->id = $id;
     }
 
     /**
+     * Returns attributes.
      * @return array
      */
     public function get_attrs()
@@ -92,6 +105,7 @@ class Field
     }
 
     /**
+     * Sets attributes.
      * @param array $attrs
      */
     public function set_attrs( array $attrs )
@@ -100,6 +114,7 @@ class Field
     }
 
     /**
+     * Returns attributes HTML string.
      * @return string
      */
     public function get_attrs_html()
@@ -110,15 +125,17 @@ class Field
     }
 
     /**
+     * Adds attribute.
      * @param string $name
      * @param string $value
      */
-    public function add_attr( $name, $value )
+    public function add_attr( string $name, string $value )
     {
         $this->attrs[ $name ] = $value;
     }
 
     /**
+     * Returns callback.
      * @return callable
      */
     public function get_callback()
@@ -127,6 +144,7 @@ class Field
     }
 
     /**
+     * Sets callback.
      * @param callable $callback
      */
     public function set_callback( callable $callback )
@@ -135,6 +153,7 @@ class Field
     }
 
     /**
+     * Returns description.
      * @return string
      */
     public function get_description()
@@ -143,13 +162,18 @@ class Field
     }
 
     /**
+     * Sets description.
      * @param string $description
      */
-    public function set_description( $description )
+    public function set_description( string $description )
     {
         $this->description = $description;
     }
 
+    /**
+     * Returns HTML element.
+     * @return string
+     */
     public function get_html()
     {
         $callback = $this->get_callback();

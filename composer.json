@@ -1,13 +1,14 @@
 {
   "name": "innocode-digital/wp-instagram",
-  "version": "1.1.0",
-  "type": "wordpress-muplugin",
+  "version": "2.0.0",
+  "type": "wordpress-plugin",
   "license": "GPL-2.0+",
   "require": {
+    "ext-json": "*",
     "composer/installers": "~1.0",
-    "cosenary/instagram": "^2.3"
+    "espresso-dev/instagram-basic-display-php": "^1.1"
   },
-  "description": "Enables Instagram API for developers.",
+  "description": "Enables Instagram Basic Display API for developers.",
   "autoload": {
     "psr-4": {
       "Innocode\\Instagram\\": "src/"

@@ -9,10 +9,12 @@ namespace Innocode\Instagram;
 final class Query
 {
     /**
+     * Base endpoint.
      * @var string
      */
-    private $endpoint ;
+    private $endpoint;
     /**
+     * Routes collection.
      * @var array
      */
     private $routes = [];
@@ -21,12 +23,13 @@ final class Query
      * Query constructor.
      * @param string $endpoint
      */
-    public function __construct( $endpoint )
+    public function __construct( string $endpoint )
     {
         $this->endpoint = $endpoint;
     }
 
     /**
+     * Returns base endpoint.
      * @return string
      */
     public function get_endpoint()
@@ -35,6 +38,7 @@ final class Query
     }
 
     /**
+     * Returns routes collection.
      * @return array
      */
     public function get_routes()
@@ -43,50 +47,64 @@ final class Query
     }
 
     /**
-     * @param string   $uri
-     * @param callable $callback
+     * Adds route to collection.
+     * @param string      $name
+     * @param callable    $callback
+     * @param string|null $capability
      */
-    public function add_route( $uri, callable $callback )
+    public function add_route( string $name, callable $callback, string $capability = null )
     {
-        $this->routes[ $uri ] = $callback;
+        $route = new Route( $callback );
+
+        if ( ! is_null( $capability ) ) {
+            $route->set_capability( $capability );
+        }
+
+        $this->routes[ $name ] = $route;
     }
 
     /**
-     * @param string $uri
+     * Returns endpoint.
+     * @param string $path
      * @return string
      */
-    public function path( $uri )
+    public function path( string $path )
     {
-        return "/{$this->get_endpoint()}/$uri/";
+        return "/{$this->get_endpoint()}/" . trim( $path, '/' ) . '/';
     }
 
     /**
-     * @param string $uri
+     * Returns URL.
+     * @param string $route
+     * @param bool   $main_site
      * @return string
      */
-    public function url( $uri )
+    public function url( string $route, bool $main_site = true )
     {
-        return network_home_url(
-            $this->path( $uri ),
-            is_ssl() ? 'https' : 'http'
-        );
+        $path = $this->path( $route );
+        $scheme = is_ssl() ? 'https' : 'http';
+
+        return $main_site
+            ? network_home_url( $path, $scheme )
+            : home_url( $path, $scheme );
     }
 
+    /**
+     * Handles request.
+     */
     public function handle_request()
     {
         $endpoint = $this->get_endpoint();
-        $uri = get_query_var( $endpoint, null );
+        $route = get_query_var( $endpoint, null );
 
-        if ( is_null( $uri ) ) {
+        if ( is_null( $route ) ) {
             return;
         }
 
         $routes = $this->get_routes();
 
-        if ( isset( $routes[ $uri ] ) ) {
-            $routes[ $uri ]();
-
-            exit;
+        if ( isset( $routes[ $route ] ) ) {
+            $routes[ $route ]();
         }
     }
 }

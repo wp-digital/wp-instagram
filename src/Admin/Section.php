@@ -9,14 +9,17 @@ namespace Innocode\Instagram\Admin;
 class Section
 {
     /**
+     * Name.
      * @var string
      */
     protected $name;
     /**
+     * Title.
      * @var string
      */
     protected $title;
     /**
+     * Fields.
      * @var Field[]
      */
     protected $fields = [];
@@ -26,13 +29,14 @@ class Section
      * @param string $name
      * @param string $title
      */
-    public function __construct( $name, $title )
+    public function __construct( string $name, string $title )
     {
         $this->name = $name;
         $this->title = $title;
     }
 
     /**
+     * Returns name.
      * @return string
      */
     public function get_name()
@@ -41,6 +45,7 @@ class Section
     }
 
     /**
+     * Returns title.
      * @return string
      */
     public function get_title()
@@ -49,6 +54,7 @@ class Section
     }
 
     /**
+     * Returns fields.
      * @return Field[]
      */
     public function get_fields()
@@ -57,10 +63,11 @@ class Section
     }
 
     /**
+     * Adds field.
      * @param string $name
      * @param Field  $field
      */
-    public function add_field( $name, Field $field )
+    public function add_field( string $name, Field $field )
     {
         $this->fields[ $name ] = $field;
     }

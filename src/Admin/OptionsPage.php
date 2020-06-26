@@ -9,30 +9,37 @@ namespace Innocode\Instagram\Admin;
 class OptionsPage
 {
     /**
+     * Name.
      * @var string
      */
     protected $name;
     /**
+     * Menu slug.
      * @var string
      */
     protected $menu_slug;
     /**
+     * Title.
      * @var string
      */
     protected $title;
     /**
+     * Menu title.
      * @var string
      */
     protected $menu_title;
     /**
+     * Capability.
      * @var string
      */
     protected $capability = 'manage_options';
     /**
+     * View file name.
      * @var string
      */
     protected $view;
     /**
+     * Sections collection.
      * @var Section[]
      */
     protected $sections = [];
@@ -43,7 +50,7 @@ class OptionsPage
      * @param string $menu_slug
      * @param string $title
      */
-    public function __construct( $name, $menu_slug, $title )
+    public function __construct( string $name, string $menu_slug, string $title )
     {
         $this->name = $name;
         $this->menu_slug = $menu_slug;
@@ -52,6 +59,7 @@ class OptionsPage
     }
 
     /**
+     * Returns name.
      * @return string
      */
     public function get_name()
@@ -60,6 +68,7 @@ class OptionsPage
     }
 
     /**
+     * Returns menu slug.
      * @return string
      */
     public function get_menu_slug()
@@ -68,6 +77,7 @@ class OptionsPage
     }
 
     /**
+     * Returns title.
      * @return string
      */
     public function get_title()
@@ -76,6 +86,7 @@ class OptionsPage
     }
 
     /**
+     * Returns menu title.
      * @return string
      */
     public function get_menu_title()
@@ -84,14 +95,16 @@ class OptionsPage
     }
 
     /**
+     * Sets menu title.
      * @param string $menu_title
      */
-    public function set_menu_title( $menu_title )
+    public function set_menu_title( string $menu_title )
     {
         $this->menu_title = $menu_title;
     }
 
     /**
+     * Returns capability.
      * @return string
      */
     public function get_capability()
@@ -100,14 +113,16 @@ class OptionsPage
     }
 
     /**
+     * Sets capability.
      * @param string $capability
      */
-    public function set_capability( $capability )
+    public function set_capability( string $capability )
     {
         $this->capability = $capability;
     }
 
     /**
+     * Returns view file name.
      * @return string
      */
     public function get_view()
@@ -116,14 +131,16 @@ class OptionsPage
     }
 
     /**
+     * Sets view file name.
      * @param string $view
      */
-    public function set_view( $view )
+    public function set_view( string $view )
     {
         $this->view = $view;
     }
 
     /**
+     * Returns sections collection.
      * @return Section[]
      */
     public function get_sections()
@@ -132,32 +149,27 @@ class OptionsPage
     }
 
     /**
+     * Adds section.
      * @param string  $name
      * @param Section $section
      */
-    public function add_section( $name, Section $section )
+    public function add_section( string $name, Section $section )
     {
         $this->sections[ $name ] = $section;
     }
 
     /**
+     * Returns admin page URL.
      * @param int|null $blog_id
      * @return string
      */
-    public function get_admin_url( $blog_id = null )
+    public function get_admin_url( int $blog_id = null )
     {
         return get_admin_url( $blog_id, "options-general.php?page={$this->get_menu_slug()}" );
     }
 
     /**
-     * @return string
-     */
-    public function get_hook()
-    {
-        return get_plugin_page_hook( $this->get_menu_slug(), 'options-general.php' );
-    }
-
-    /**
+     * Checks whether page has at least one field which is not disabled.
      * @return bool
      */
     public function has_enabled_fields()
