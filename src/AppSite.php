@@ -75,6 +75,7 @@ final class AppSite
     }
 
     /**
+     * Performs HTTP request to app site.
      * @param string $method
      * @param string $path
      * @param array  $args
@@ -107,7 +108,7 @@ final class AppSite
     }
 
     /**
-     *
+     * Creates signed request with site data.
      * @param string $method
      * @param array  $payload
      * @param array  $args
@@ -131,7 +132,7 @@ final class AppSite
     }
 
     /**
-     *
+     * Adds current site data to app site.
      * @param string $user_id
      * @return array|WP_Error
      */
@@ -144,7 +145,7 @@ final class AppSite
     }
 
     /**
-     *
+     * Updates current site data on app site.
      * @param string $previous_user_id
      * @param string $user_id
      * @return array|WP_Error
@@ -159,7 +160,7 @@ final class AppSite
     }
 
     /**
-     *
+     * Deletes current site data from app site.
      * @param string $user_id
      * @return array|WP_Error
      */

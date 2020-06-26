@@ -18,7 +18,7 @@ try {
     wp_die( $exception->getMessage(), WP_Http::BAD_REQUEST );
 }
 
-$access_token = $options_page->get_sections()['']
+$access_token = $options_page->get_sections()[ $this::SECTION_GENERAL ]
     ->get_fields()['access_token']
     ->get_setting()
     ->get_value();

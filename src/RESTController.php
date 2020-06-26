@@ -51,6 +51,9 @@ class RESTController extends WP_REST_Controller
         );
     }
 
+    /**
+     * Adds app site routes.
+     */
     public function register_app_site_routes()
     {
         register_rest_route(
@@ -183,7 +186,7 @@ class RESTController extends WP_REST_Controller
     }
 
     /**
-     *
+     * Updates site user_id on app site.
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
@@ -221,7 +224,7 @@ class RESTController extends WP_REST_Controller
     }
 
     /**
-     *
+     * Deletes site with user_id from app site.
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
@@ -251,6 +254,7 @@ class RESTController extends WP_REST_Controller
     }
 
     /**
+     * Returns parsed signed request.
      * @param WP_REST_Request $request
      * @return array|WP_Error
      */
@@ -288,6 +292,7 @@ class RESTController extends WP_REST_Controller
     }
 
     /**
+     * Returns parsed signed request with site data.
      * @param WP_REST_Request $request
      * @return array|WP_Error
      */

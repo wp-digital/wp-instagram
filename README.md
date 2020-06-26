@@ -71,6 +71,12 @@ change with constant:
 define( 'INNOCODE_INSTAGRAM_ENDPOINT', '' );
 ````
 
+App site. Description coming soon...
+
+````
+define( 'INNOCODE_INSTAGRAM_APP_SITE', '' );
+````
+
 ---
 
 It's possible to change full auth URL:
