@@ -47,11 +47,11 @@ create an APP.
 5. Click on **Log in** button or **Log in as another user** in case when should change
 account.
 
-6. Start use [Instagram Basic Display PHP API](https://github.com/cosenary/Instagram-PHP-API) through
+6. Start use [Instagram Basic Display PHP API](https://github.com/espresso-dev/instagram-basic-display-php) through
 `innocode_instagram();` function e.g. `innocode_instagram()->getUserProfile();`.
 
 7. (optional) Set site deauth REST API endpoint `https://site.com/wp-json/innocode/v1/instagram/deauth` in
-**Deauthorize Callback URL** in **Basic Display**. 
+**Deauthorize Callback URL** in **Basic Display**.
 
 ### Notes
 
@@ -68,13 +68,20 @@ By default, endpoint auth URL is using `instagram` as endpoint, but it's possibl
 change with constant:
 
 ````
-define( 'INNOCODE_INSTAGRAM_ENDPOINT', '' );
+define( 'INNOCODE_INSTAGRAM_ENDPOINT', 'insta' );
 ````
 
-App site. Description coming soon...
+---
+
+#### App site
+
+If you want to use one APP for all of your sites where Instagram integration is in use and correctly handle
+deauthorization process then this plugin could be installed additionally on a site which will store user IDs and URLs of sites
+where these IDs are using, e.g. this could be a site of your company. Then it's needed to set one more constant on all
+sites with activated plugin.
 
 ````
-define( 'INNOCODE_INSTAGRAM_APP_SITE', '' );
+define( 'INNOCODE_INSTAGRAM_APP_SITE', 'https://app-site.com' );
 ````
 
 ---
