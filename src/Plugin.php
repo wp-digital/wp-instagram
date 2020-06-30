@@ -241,9 +241,14 @@ final class Plugin
      */
     public function get_state()
     {
+        $original_user_id = get_current_user_id();
+        wp_set_current_user( 0 );
+        $nonce = wp_create_nonce( 'innocode_instagram-auth' );
+        wp_set_current_user( $original_user_id );
+
         return apply_filters(
             'innocode_instagram_state',
-            get_current_blog_id() . ':' . wp_create_nonce( 'innocode_instagram-auth' )
+            get_current_blog_id() . ":$nonce"
         );
     }
 
