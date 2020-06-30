@@ -285,7 +285,12 @@ final class Plugin
 
         list( $blog_id, $nonce ) = explode( ':', $state, 2 );
 
-        if ( ! wp_verify_nonce( $nonce, 'innocode_instagram-auth' ) ) {
+        $original_user_id = get_current_user_id();
+        wp_set_current_user( 0 );
+        $nonce_verified = wp_verify_nonce( $nonce, 'innocode_instagram-auth' );
+        wp_set_current_user( $original_user_id );
+
+        if ( 1 !== $nonce_verified ) {
             wp_die(
                 '<h1>' . __( 'This link has expired.' ) . '</h1>' .
                 '<p>' . __( 'Please try again.' ) . '</p>',
