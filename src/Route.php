@@ -62,7 +62,7 @@ class Route
     {
         $capability = $this->get_capability();
 
-        if ( $capability && current_user_can( $capability ) ) {
+        if ( ! $capability || current_user_can( $capability ) ) {
             $this->get_callback()();
             exit;
         }

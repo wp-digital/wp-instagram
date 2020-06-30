@@ -494,7 +494,7 @@ final class Plugin
                 : 'instagram'
         );
         $capability = $this->get_options_page()->get_capability();
-        $this->query->add_route( 'auth', [ $this, 'auth' ], $capability );
+        $this->query->add_route( 'auth', [ $this, 'auth' ] );
         $this->query->add_route( 'deauth', [ $this, 'deauth' ], $capability );
     }
 
