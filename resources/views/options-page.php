@@ -30,7 +30,7 @@ $access_token = $options_page->get_sections()[ $this::SECTION_GENERAL ]
             <?= $access_token ? __( 'Log in as another user', 'innocode-instagram' ) : __( 'Log in' ) ?>
         </a>
         <?php if ( $access_token ) : ?>
-            <a href="<?= $this->get_query()->url( 'deauth', false ) ?>" class="button">
+            <a href="<?= $this->get_query()->url( get_current_blog_id(), 'deauth' ) ?>" class="button">
                 <?php _e( 'Log out' ) ?>
             </a>
             <span class="description">

@@ -75,18 +75,15 @@ final class Query
 
     /**
      * Returns URL.
+     * @param int    $blog_id
      * @param string $route
-     * @param bool   $main_site
      * @return string
      */
-    public function url( string $route, bool $main_site = true )
+    public function url( int $blog_id, string $route )
     {
         $path = $this->path( $route );
-        $scheme = is_ssl() ? 'https' : 'http';
 
-        return $main_site
-            ? network_home_url( $path, $scheme )
-            : home_url( $path, $scheme );
+        return get_home_url( $blog_id, $path );
     }
 
     /**

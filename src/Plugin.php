@@ -219,7 +219,7 @@ final class Plugin
     {
         return apply_filters(
             'innocode_instagram_redirect_uri',
-            $this->get_query()->url( 'auth' )
+            $this->get_query()->url( get_main_site_id(), 'auth' )
         );
     }
 
@@ -241,14 +241,9 @@ final class Plugin
      */
     public function get_state()
     {
-        $original_user_id = get_current_user_id();
-        wp_set_current_user( 0 );
-        $nonce = wp_create_nonce( 'innocode_instagram-auth' );
-        wp_set_current_user( $original_user_id );
-
         return apply_filters(
             'innocode_instagram_state',
-            get_current_blog_id() . ":$nonce"
+            get_current_blog_id() . ':' . wp_create_nonce( 'innocode_instagram-auth' )
         );
     }
 
@@ -285,19 +280,6 @@ final class Plugin
 
         list( $blog_id, $nonce ) = explode( ':', $state, 2 );
 
-        $original_user_id = get_current_user_id();
-        wp_set_current_user( 0 );
-        $nonce_verified = wp_verify_nonce( $nonce, 'innocode_instagram-auth' );
-        wp_set_current_user( $original_user_id );
-
-        if ( 1 !== $nonce_verified ) {
-            wp_die(
-                '<h1>' . __( 'This link has expired.' ) . '</h1>' .
-                '<p>' . __( 'Please try again.' ) . '</p>',
-                WP_Http::FORBIDDEN
-            );
-        }
-
         if (
             ! $blog_id ||
             is_multisite() && false === ( $blog = get_blog_details( $blog_id ) )
@@ -309,17 +291,47 @@ final class Plugin
             );
         }
 
-        $blogname = isset( $blog ) ? $blog->blogname : get_bloginfo( 'name' );
+        $code = isset( $_GET['code'] ) ? $_GET['code'] : '';
+
+        if ( $blog_id != get_current_blog_id() ) {
+            wp_redirect(
+                add_query_arg(
+                    [
+                        'code'  => $code,
+                        'state' => $state,
+                    ],
+                    $this->get_query()->url( $blog_id, 'auth' )
+                )
+            );
+            exit;
+        }
 
         $options_page = $this->get_options_page();
+
+        if ( ! current_user_can( $options_page->get_capability() ) ) {
+            wp_die(
+                '<h1>' . __( 'Something went wrong.' ) . '</h1>' .
+                '<p>' . __( 'Sorry, you are not allowed to access this page.' ) . '</p>',
+                WP_Http::UNAUTHORIZED
+            );
+        }
+
+        if ( 1 !== wp_verify_nonce( $nonce, 'innocode_instagram-auth' ) ) {
+            wp_die(
+                '<h1>' . __( 'This link has expired.' ) . '</h1>' .
+                '<p>' . __( 'Please try again.' ) . '</p>',
+                WP_Http::FORBIDDEN
+            );
+        }
+
+        $blogname = isset( $blog ) ? $blog->blogname : get_bloginfo( 'name' );
+
         $options_page_url = $options_page->get_admin_url( $blog_id );
         $return_link = sprintf(
             '<p><a href="%s">%s</a>.</p>',
             $options_page_url,
             sprintf( __( 'Return to %s', 'innocode-instagram' ), $blogname )
         );
-
-        $code = isset( $_GET['code'] ) ? $_GET['code'] : '';
 
         if ( ! $code ) {
             wp_die(
@@ -504,7 +516,12 @@ final class Plugin
                 : 'instagram'
         );
         $capability = $this->get_options_page()->get_capability();
-        $this->query->add_route( 'auth', [ $this, 'auth' ] );
+        // On multisite checks capability inside action
+        $this->query->add_route(
+            'auth',
+            [ $this, 'auth' ],
+            ! is_multisite() ? $capability : null
+        );
         $this->query->add_route( 'deauth', [ $this, 'deauth' ], $capability );
     }
 
