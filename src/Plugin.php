@@ -264,7 +264,7 @@ final class Plugin
                         ? esc_html( $_GET['error_description'] )
                         : __( 'Unknown error.', 'innocode-instagram' )
                 ),
-                WP_Http::FORBIDDEN
+                WP_Http::BAD_REQUEST
             );
         }
 
