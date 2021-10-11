@@ -2,10 +2,10 @@
 /**
  * Plugin Name: WordPress Instagram Basic Display integration
  * Description: Enables Instagram Basic Display API for developers.
- * Version: 2.1.1
+ * Version: 2.1.2
  * Author: Innocode
  * Author URI: https://innocode.com
- * Tested up to: 5.4.2
+ * Tested up to: 5.8.1
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */

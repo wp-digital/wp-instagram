@@ -44,9 +44,10 @@ class RESTController extends WP_REST_Controller
             $this->namespace,
             "/$this->rest_base/deauth",
             [
-                'methods'  => WP_REST_Server::CREATABLE,
-                'callback' => [ $this, 'deauth' ],
-                'args'     => $this->get_endpoint_args_for_signed_request(),
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => [ $this, 'deauth' ],
+                'permission_callback' => '__return_true',
+                'args'                => $this->get_endpoint_args_for_signed_request(),
             ]
         );
     }
@@ -60,9 +61,10 @@ class RESTController extends WP_REST_Controller
             $this->namespace,
             "/$this->rest_base/sites",
             [
-                'methods'  => WP_REST_Server::EDITABLE,
-                'callback' => [ $this, 'update_site' ],
-                'args'     => $this->get_endpoint_args_for_signed_request(),
+                'methods'             => WP_REST_Server::EDITABLE,
+                'callback'            => [ $this, 'update_site' ],
+                'permission_callback' => '__return_true',
+                'args'                => $this->get_endpoint_args_for_signed_request(),
             ]
         );
 
@@ -70,9 +72,10 @@ class RESTController extends WP_REST_Controller
             $this->namespace,
             "/$this->rest_base/sites",
             [
-                'methods'  => WP_REST_Server::DELETABLE,
-                'callback' => [ $this, 'delete_site' ],
-                'args'     => $this->get_endpoint_args_for_signed_request(),
+                'methods'             => WP_REST_Server::DELETABLE,
+                'callback'            => [ $this, 'delete_site' ],
+                'permission_callback' => '__return_true',
+                'args'                => $this->get_endpoint_args_for_signed_request(),
             ]
         );
     }
